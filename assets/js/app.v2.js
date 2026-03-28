@@ -75,17 +75,21 @@ async function saveTask(task) {
         delete taskData.id;
         taskData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
 
+        // Écriture Asynchrone Instantanée (Offline-first / Rapide)
         if (task.id && typeof task.id === 'string') {
-            await db.collection('tasks').doc(task.id).set(taskData, { merge: true });
+            db.collection('tasks').doc(task.id).set(taskData, { merge: true }).catch(e => console.error(e));
         } else {
             taskData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-            const ref = await db.collection('tasks').add(taskData);
+            const ref = db.collection('tasks').doc(); // Création d'ID synchronisée localement
             task.id = ref.id;
+            ref.set(taskData).catch(e => console.error(e));
         }
-        _updateLocalCache();
+        
+        // Rafraîchissement direct de l'UI sans attendre la synchronisation réseau complète
+        _saveLocalTask(task);
         return task;
     } catch (e) {
-        console.error("Erreur sauvegarde Firestore:", e);
+        console.error("Erreur sauvegarde locale:", e);
         _saveLocalTask(task);
         return task;
     }
@@ -151,20 +155,25 @@ function _saveLocalTask(task) {
 async function uploadPhoto(file) {
     if (!file) return null;
     if (!storage) {
-        // Fallback local : resize d'abord pour limiter la taille
         return await resizeImageToBase64(file, 600, 600);
     }
     try {
-        showToast("Envoi de la photo…", "info");
+        showToast("Envoi de la photo en cours (6s max)…", "info");
         const ext  = file.name.split('.').pop();
         const path = `photos/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
         const ref  = storage.ref(path);
-        await ref.put(file);
+        
+        // Timeout de sécurité pour ne pas bloquer l'application
+        const uploadTask = ref.put(file);
+        const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error("Connexion trop lente")), 6000));
+        
+        await Promise.race([uploadTask, timeout]);
         const url = await ref.getDownloadURL();
+        showToast("Photo sauvegardée avec succès !", "success");
         return url;
     } catch (e) {
-        console.error("Erreur upload photo:", e);
-        // Fallback : resize local
+        console.warn("Échec/Lenteur réseau pour la photo, utilisation du mode hors-ligne:", e.message);
+        showToast("Connexion lente : la photo est enregistrée localement !", "warning");
         return await resizeImageToBase64(file, 600, 600);
     }
 }
@@ -262,7 +271,7 @@ async function saveSettings(settings) {
     localStorage.setItem('sw_settings', JSON.stringify(settings));
     if (!db) return;
     try {
-        await db.collection('settings').doc('main').set(settings, { merge: true });
+        db.collection('settings').doc('main').set(settings, { merge: true }).catch(e => console.error(e));
     } catch(e) { console.error("Erreur save settings:", e); }
 }
 

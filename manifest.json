@@ -2,7 +2,7 @@
   "name": "Sarkin Wanka Fashion Design",
   "short_name": "Sarkin Wanka",
   "description": "Gestion de commandes pour atelier de couture",
-  "start_url": "/index.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#F8F6F0",
   "theme_color": "#A67C00",
@@ -26,12 +26,12 @@
       "name": "Nouvelle Commande",
       "short_name": "Commande",
       "description": "Ajouter une nouvelle commande",
-      "url": "/index.html?action=new",
+      "url": "./index.html?action=new",
       "icons": [{"src": "assets/img/logo.png", "sizes": "96x96"}]
     },
     {
       "name": "Atelier",
-      "url": "/atelier.html",
+      "url": "./atelier.html",
       "icons": [{"src": "assets/img/logo.png", "sizes": "96x96"}]
     }
   ],

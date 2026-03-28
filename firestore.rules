@@ -26,6 +26,11 @@ service cloud.firestore {
       // TODO: restreindre l'écriture aux admins authentifiés
     }
 
+    // Ping de connectivité Firebase (indicateur de statut en temps réel)
+    match /_ping/{docId} {
+      allow read, write: if true;
+    }
+
     // Bloquer tout le reste
     match /{document=**} {
       allow read, write: if false;

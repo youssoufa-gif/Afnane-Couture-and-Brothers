@@ -20,11 +20,40 @@ const FIREBASE_CONFIG = {
 let db, storage, auth;
 let _tasksCache = null;
 let _unsubscribeTasks = null;
+let _firebaseConnected = false;
+
+// ===================================================================
+// INDICATEUR DE CONNEXION FIREBASE
+// ===================================================================
+function _showConnectionStatus(connected) {
+    _firebaseConnected = connected;
+    let dot = document.getElementById('firebase-status-dot');
+    if (!dot) {
+        dot = document.createElement('div');
+        dot.id = 'firebase-status-dot';
+        dot.title = connected ? 'Firebase connecté' : 'Mode hors-ligne';
+        dot.style.cssText = `
+            position:fixed; bottom:70px; right:14px; z-index:8888;
+            width:12px; height:12px; border-radius:50%;
+            background:${connected ? '#22c55e' : '#f97316'};
+            box-shadow: 0 0 0 3px ${connected ? 'rgba(34,197,94,0.25)' : 'rgba(249,115,22,0.25)'};
+            transition: background 0.4s, box-shadow 0.4s;
+            cursor:pointer;
+        `;
+        dot.onclick = () => showToast(connected ? '✅ Firebase connecté — données synchronisées' : '⚠️ Hors-ligne — données sauvegardées localement', connected ? 'success' : 'warning');
+        document.body.appendChild(dot);
+    } else {
+        dot.style.background = connected ? '#22c55e' : '#f97316';
+        dot.style.boxShadow = `0 0 0 3px ${connected ? 'rgba(34,197,94,0.25)' : 'rgba(249,115,22,0.25)'}`;
+        dot.title = connected ? 'Firebase connecté' : 'Mode hors-ligne';
+    }
+}
 
 async function initFirebase() {
     try {
         if (typeof firebase === 'undefined') {
             console.error("SDK Firebase non chargé. Vérifiez les scripts dans le HTML.");
+            _showConnectionStatus(false);
             return false;
         }
         if (!firebase.apps.length) {
@@ -39,9 +68,24 @@ async function initFirebase() {
             console.warn("Persistence Firebase non disponible:", err.code);
         });
 
+        // Écouter l'état de connexion réseau Firestore
+        db.collection('_ping').doc('status').onSnapshot(
+            () => _showConnectionStatus(true),
+            () => _showConnectionStatus(false)
+        );
+
+        // Test de connectivité rapide
+        try {
+            await db.collection('_ping').doc('status').set({ t: Date.now() }, { merge: true });
+            _showConnectionStatus(true);
+        } catch(e) {
+            _showConnectionStatus(false);
+        }
+
         return true;
     } catch (e) {
         console.error("Erreur init Firebase:", e);
+        _showConnectionStatus(false);
         return false;
     }
 }
@@ -149,33 +193,53 @@ function _saveLocalTask(task) {
     localStorage.setItem('sw_tasks_cache', JSON.stringify(tasks));
 }
 
+function _saveLocalTaskField(taskId, field, value) {
+    const tasks = _getLocalTasks();
+    const t = tasks.find(t => t.id === taskId);
+    if (t) {
+        t[field] = value;
+        localStorage.setItem('sw_tasks_cache', JSON.stringify(tasks));
+    }
+}
+
 // ===================================================================
 // UPLOAD PHOTO (Firebase Storage — pas de base64 massif)
 // ===================================================================
+// Upload photo EN ARRIÈRE-PLAN (ne bloque pas l'enregistrement)
+async function uploadPhotoBackground(file, taskId) {
+    if (!file || !taskId) return;
+    try {
+        let url;
+        if (!storage) {
+            url = await resizeImageToBase64(file, 600, 600);
+        } else {
+            const ext  = file.name.split('.').pop();
+            const path = `photos/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+            const ref  = storage.ref(path);
+            await ref.put(file);
+            url = await ref.getDownloadURL();
+        }
+        // Mise à jour de la tâche avec l'URL définitive
+        if (url) {
+            _saveLocalTaskField(taskId, 'photo', url);
+            if (db) {
+                db.collection('tasks').doc(taskId)
+                  .update({ photo: url })
+                  .catch(e => console.warn('Mise à jour photo Firebase:', e));
+            }
+            // Rafraîchir les vues silencieusement
+            renderAgenda(); renderAtelier(); renderBibliotheque();
+        }
+    } catch (e) {
+        console.warn("Erreur upload photo (non bloquant):", e.message);
+    }
+}
+
+// Upload SYNCHRONE uniquement pour les aperçus locaux immédiats
 async function uploadPhoto(file) {
     if (!file) return null;
-    if (!storage) {
-        return await resizeImageToBase64(file, 600, 600);
-    }
-    try {
-        showToast("Envoi de la photo en cours (6s max)…", "info");
-        const ext  = file.name.split('.').pop();
-        const path = `photos/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-        const ref  = storage.ref(path);
-        
-        // Timeout de sécurité pour ne pas bloquer l'application
-        const uploadTask = ref.put(file);
-        const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error("Connexion trop lente")), 6000));
-        
-        await Promise.race([uploadTask, timeout]);
-        const url = await ref.getDownloadURL();
-        showToast("Photo sauvegardée avec succès !", "success");
-        return url;
-    } catch (e) {
-        console.warn("Échec/Lenteur réseau pour la photo, utilisation du mode hors-ligne:", e.message);
-        showToast("Connexion lente : la photo est enregistrée localement !", "warning");
-        return await resizeImageToBase64(file, 600, 600);
-    }
+    // Toujours retourner base64 immédiatement pour ne pas bloquer
+    return await resizeImageToBase64(file, 600, 600);
 }
 
 function resizeImageToBase64(file, maxW, maxH) {
@@ -822,10 +886,10 @@ if (form) {
         submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enregistrement…';
 
         try {
-            // Upload photo si présente
+            // ✅ Aperçu local immédiat (base64 rapide, pas d'attente réseau)
             let photoUrl = null;
             if (currentPhotoFile) {
-                photoUrl = await uploadPhoto(currentPhotoFile);
+                photoUrl = await resizeImageToBase64(currentPhotoFile, 600, 600);
             }
 
             const newTask = {
@@ -838,23 +902,40 @@ if (form) {
                 assignee: document.getElementById('task-assignee')?.value || '',
                 notes:    document.getElementById('task-notes').value.trim()
             };
-            if (photoUrl) newTask.photo = photoUrl;
+
             if (currentEditingTaskId) {
                 newTask.id = currentEditingTaskId;
-                // Preserve photo if no new one
+                // Conserver la photo existante si pas de nouvelle
                 if (!photoUrl) {
-                    const allT = await getTasks();
-                    const oldT = allT.find(x => x.id === currentEditingTaskId);
+                    const oldT = _getLocalTasks().find(x => x.id === currentEditingTaskId);
                     if (oldT && oldT.photo) newTask.photo = oldT.photo;
+                } else {
+                    newTask.photo = photoUrl;
                 }
+            } else {
+                if (photoUrl) newTask.photo = photoUrl;
             }
 
+            // ✅ ENREGISTREMENT INSTANTANÉ (local + Firebase en arrière-plan)
             const saved = await saveTask(newTask);
+
+            // ✅ Upload Firebase de la photo EN ARRIÈRE-PLAN (sans bloquer)
+            if (currentPhotoFile && storage && !currentEditingTaskId) {
+                uploadPhotoBackground(currentPhotoFile, saved.id);
+            }
+
+            // Fermer + afficher reçu + refresh UI immédiatement
             printReceipt(saved);
             closeNewTaskModal();
-            renderAgenda(); renderAtelier(); renderBibliotheque();
-            updateStats(); renderRevenueBanner();
-            showToast("Commande enregistrée !");
+            showToast("✅ Commande enregistrée instantanément !");
+
+            // Refresh UI (non-bloquant)
+            renderAgenda();
+            renderAtelier();
+            renderBibliotheque();
+            updateStats();
+            renderRevenueBanner();
+
         } catch(err) {
             console.error(err);
             showToast("Erreur lors de l'enregistrement.", "error");

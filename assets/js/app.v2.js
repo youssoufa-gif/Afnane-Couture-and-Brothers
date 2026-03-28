@@ -3,15 +3,15 @@
 // ===================================================================
 
 // ===================================================================
-// FIREBASE CONFIG — Remplacez ces valeurs par votre projet Firebase
+// FIREBASE CONFIG — Sarkin Wanka Project Keys
 // ===================================================================
 const FIREBASE_CONFIG = {
-    apiKey:            "VOTRE_API_KEY",
-    authDomain:        "VOTRE_PROJECT.firebaseapp.com",
-    projectId:         "VOTRE_PROJECT_ID",
-    storageBucket:     "VOTRE_PROJECT.appspot.com",
-    messagingSenderId: "VOTRE_SENDER_ID",
-    appId:             "VOTRE_APP_ID"
+    apiKey:            "AIzaSyCsZjFDDLZ5_T72hLjULbiedB30yxjLxcI",
+    authDomain:        "sarkin-wanka.firebaseapp.com",
+    projectId:         "sarkin-wanka",
+    storageBucket:     "sarkin-wanka.firebasestorage.app",
+    messagingSenderId: "646391372587",
+    appId:             "1:646391372587:web:78db1a4e92178e7adfc36e"
 };
 
 // ===================================================================

@@ -1169,7 +1169,7 @@ function printReceipt(taskOrJson) {
     if (!win) { showToast("Autorisez les pop-ups pour imprimer.", "error"); return; }
 
     getSettings().then(settings => {
-        const shopName  = settings.name  || "SARKIN WANKA Fashion Design";
+        const shopName  = settings.name  || "FAHAD SARKIN WANKA";
         const shopPhone = settings.phone || "+227 92 62 27 64";
         const shopAddr  = settings.address || "Niamey, Niger";
         const cur       = settings.currency || "FCFA";
@@ -1193,7 +1193,7 @@ function printReceipt(taskOrJson) {
                 `━━━━━━━━━━━━━━━━━━━━\n` +
                 `👤 *Client :* ${task.client}\n` +
                 `👗 *Article :* ${task.type}\n` +
-                `📅 *Date de livraison :* ${dateStr}\n` +
+                `📅 *RDV :* ${dateStr}\n` +
                 (task.assignee ? `🧵 *Tailleur :* ${task.assignee}\n` : '') +
                 (task.notes ? `📝 *Notes :* ${task.notes}\n` : '') +
                 `━━━━━━━━━━━━━━━━━━━━\n` +
@@ -1261,7 +1261,7 @@ function printReceipt(taskOrJson) {
   <div class="body">
     <div class="section-label">Informations du reçu</div>
     <div class="field-row"><span class="field-label">Date d'enregistrement</span><span class="field-val">${dateToday}</span></div>
-    <div class="field-row"><span class="field-label">Date de livraison</span><span class="field-val">${dateStr}</span></div>
+    <div class="field-row"><span class="field-label">RDV</span><span class="field-val">${dateStr}</span></div>
 
     <div class="section-label">Client</div>
     <div class="field-row"><span class="field-label">Nom</span><span class="field-val">${task.client}</span></div>

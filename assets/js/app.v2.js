@@ -115,25 +115,35 @@ async function saveTask(task) {
         return task;
     }
     try {
+        // ✅ FIX PERFORMANCE : on retire le base64 du document Firestore
+        // Les images base64 (200-500 KB) dans Firestore causent des délais de 5-10 min
         const taskData = { ...task };
         delete taskData.id;
+
+        // Si la photo est un base64 local, on NE l'envoie PAS à Firestore
+        // Elle reste dans localStorage pour l'affichage local immédiat
+        // Firebase Storage la recevra via uploadPhotoBackground()
+        if (taskData.photo && taskData.photo.startsWith('data:')) {
+            delete taskData.photo; // ← NE PAS envoyer base64 à Firestore
+        }
+
         taskData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
 
-        // Écriture Asynchrone Instantanée (Offline-first / Rapide)
+        // Écriture ultra-rapide (sans image = document léger < 1 KB)
         if (task.id && typeof task.id === 'string') {
             db.collection('tasks').doc(task.id).set(taskData, { merge: true }).catch(e => console.error(e));
         } else {
             taskData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-            const ref = db.collection('tasks').doc(); // Création d'ID synchronisée localement
+            const ref = db.collection('tasks').doc();
             task.id = ref.id;
             ref.set(taskData).catch(e => console.error(e));
         }
-        
-        // Rafraîchissement direct de l'UI sans attendre la synchronisation réseau complète
+
+        // Cache local avec photo base64 pour affichage immédiat
         _saveLocalTask(task);
         return task;
     } catch (e) {
-        console.error("Erreur sauvegarde locale:", e);
+        console.error("Erreur sauvegarde:", e);
         _saveLocalTask(task);
         return task;
     }
@@ -211,27 +221,30 @@ async function uploadPhotoBackground(file, taskId) {
     try {
         let url;
         if (!storage) {
-            url = await resizeImageToBase64(file, 600, 600);
-        } else {
-            const ext  = file.name.split('.').pop();
-            const path = `photos/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-            const ref  = storage.ref(path);
-            await ref.put(file);
-            url = await ref.getDownloadURL();
+            // Pas de Storage → on garde le base64 local (déjà dans localStorage)
+            console.warn('Firebase Storage non disponible, photo gardée en local.');
+            return;
         }
-        // Mise à jour de la tâche avec l'URL définitive
+        // ✅ Upload vers Firebase Storage (URL courte, légère pour Firestore)
+        const ext  = file.name.split('.').pop();
+        const path = `photos/${taskId}_${Date.now()}.${ext}`;
+        const ref  = storage.ref(path);
+        await ref.put(file);
+        url = await ref.getDownloadURL();
+
         if (url) {
+            // Remplacer le base64 local par l'URL Storage (plus légère)
             _saveLocalTaskField(taskId, 'photo', url);
-            if (db) {
-                db.collection('tasks').doc(taskId)
-                  .update({ photo: url })
-                  .catch(e => console.warn('Mise à jour photo Firebase:', e));
-            }
+            // Mettre à jour Firestore avec l'URL (< 200 octets, instantané)
+            db.collection('tasks').doc(taskId)
+              .update({ photo: url })
+              .catch(e => console.warn('Mise à jour photo URL:', e));
             // Rafraîchir les vues silencieusement
             renderAgenda(); renderAtelier(); renderBibliotheque();
         }
     } catch (e) {
-        console.warn("Erreur upload photo (non bloquant):", e.message);
+        console.warn("Erreur upload photo Storage (non bloquant):", e.message);
+        // La photo base64 reste accessible localement, pas de perte de données
     }
 }
 
@@ -886,12 +899,7 @@ if (form) {
         submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enregistrement…';
 
         try {
-            // ✅ Aperçu local immédiat (base64 rapide, pas d'attente réseau)
-            let photoUrl = null;
-            if (currentPhotoFile) {
-                photoUrl = await resizeImageToBase64(currentPhotoFile, 600, 600);
-            }
-
+            // ÉTAPE 1 : Construire la tâche de base (sans photo) pour Firestore
             const newTask = {
                 client:   document.getElementById('client-name').value.trim(),
                 phone:    document.getElementById('client-phone')?.value.trim() || '',
@@ -905,22 +913,30 @@ if (form) {
 
             if (currentEditingTaskId) {
                 newTask.id = currentEditingTaskId;
-                // Conserver la photo existante si pas de nouvelle
-                if (!photoUrl) {
-                    const oldT = _getLocalTasks().find(x => x.id === currentEditingTaskId);
-                    if (oldT && oldT.photo) newTask.photo = oldT.photo;
-                } else {
-                    newTask.photo = photoUrl;
+                // Conserver la photo existante (URL Storage ou base64 local)
+                const oldT = _getLocalTasks().find(x => x.id === currentEditingTaskId);
+                if (oldT && oldT.photo && !currentPhotoFile) {
+                    newTask.photo = oldT.photo;
                 }
-            } else {
-                if (photoUrl) newTask.photo = photoUrl;
             }
 
-            // ✅ ENREGISTREMENT INSTANTANÉ (local + Firebase en arrière-plan)
+            // ÉTAPE 2 : Convertir photo en base64 pour affichage LOCAL uniquement
+            // ⚠️ Cette valeur base64 ne sera PAS envoyée à Firestore (trop lourde)
+            let localPhotoBase64 = null;
+            if (currentPhotoFile) {
+                localPhotoBase64 = await resizeImageToBase64(currentPhotoFile, 600, 600);
+                // On met le base64 dans la tâche SEULEMENT pour le cache local
+                newTask.photo = localPhotoBase64;
+            }
+
+            // ÉTAPE 3 : Enregistrement INSTANTANÉ
+            // saveTask() retirera automatiquement le base64 avant d'écrire dans Firestore
+            // Firestore reçoit un document léger < 1 KB → écriture en < 1 seconde
             const saved = await saveTask(newTask);
 
-            // ✅ Upload Firebase de la photo EN ARRIÈRE-PLAN (sans bloquer)
-            if (currentPhotoFile && storage && !currentEditingTaskId) {
+            // ÉTAPE 4 : Upload vers Firebase Storage EN ARRIÈRE-PLAN
+            // Remplace le base64 local par une vraie URL Storage une fois uploadé
+            if (currentPhotoFile && storage) {
                 uploadPhotoBackground(currentPhotoFile, saved.id);
             }
 

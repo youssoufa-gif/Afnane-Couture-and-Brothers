@@ -382,6 +382,8 @@ function updateDateDisplay() {
 // STATS
 // ===================================================================
 async function updateStats() {
+    updateBoutiqueBadge(); // Met à jour le badge boutique en même temps
+
     const tasks = await getTasks();
     const setEl = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
     setEl('stat-agenda',   tasks.filter(t => t.step === 'agenda').length);
@@ -758,7 +760,7 @@ async function renderBibliotheque(searchTerm = '') {
     }
 
     tasks.forEach(task => {
-        const ref = 'SW-' + (task.id || '').toString().slice(-6).toUpperCase();
+        const ref = 'FSW-' + (task.id || '').toString().slice(-6).toUpperCase();
         const dateStr = new Date(task.dueDate).toLocaleDateString('fr-FR');
         const dateClass = getDateClass(task.dueDate);
         const stepLabels = { agenda:'AGENDA', atelier:'ATELIER', boutique:'BOUTIQUE', livre:'LIVRÉ' };
@@ -783,14 +785,14 @@ async function renderBibliotheque(searchTerm = '') {
             </td>
             <td><strong style="color:var(--primary-color);font-family:'Cormorant Garamond',serif;font-size:1rem;">${task.price ? formatMoney(task.price) + ' ' + cur : '—'}</strong></td>
             <td>
-                <div style="display:flex;gap:6px;">
-                    <button class="btn btn-secondary" onclick="printReceipt(${JSON.stringify(JSON.stringify(task))})" style="padding:6px 10px;font-size:0.8rem;" title="Imprimer">
+                <div style="display:flex;gap:8px;">
+                    <button class="btn btn-secondary" onclick='printReceipt(${JSON.stringify(task).replace(/'/g, "&apos;")})' style="padding:10px 14px;font-size:0.9rem;" title="Imprimer">
                         <i class="fa-solid fa-print"></i>
                     </button>
-                    <button class="btn btn-secondary" style="padding:6px 10px;font-size:0.8rem;color:gray" onclick="editTask('${task.id}')" title="Modifier">
+                    <button class="btn btn-secondary" style="padding:10px 14px;font-size:0.9rem;color:gray" onclick="editTask('${task.id}')" title="Modifier">
                         <i class="fa-solid fa-pen"></i>
                     </button>
-                    <button class="btn btn-secondary" onclick="deleteTask('${task.id}')" style="padding:6px 10px;font-size:0.8rem;color:var(--danger-color)" title="Supprimer">
+                    <button class="btn btn-secondary" onclick="deleteTask('${task.id}')" style="padding:10px 14px;font-size:0.9rem;color:var(--danger-color)" title="Supprimer">
                         <i class="fa-solid fa-trash"></i>
                     </button>
                 </div>
@@ -1149,6 +1151,23 @@ function stopTailorPolling() {
     _lastKnownTasksForNotif = null;
 }
 
+// Met à jour les badges de notification sur toute l'application
+async function updateBoutiqueBadge() {
+    try {
+        const tasks = await getTasks();
+        const count = tasks.filter(t => t.step === 'boutique').length;
+        const badges = document.querySelectorAll('.boutique-badge');
+        badges.forEach(b => {
+            if (count > 0) {
+                b.textContent = count;
+                b.style.display = 'inline-block';
+            } else {
+                b.style.display = 'none';
+            }
+        });
+    } catch(e) { console.error("Badge update error:", e); }
+}
+
 function notifyTailorsIfNeeded(taskId) {
     // Déclenché uniquement sur action admin volontaire
     // Le son se joue côté tailleur via polling, pas ici
@@ -1179,7 +1198,7 @@ function printReceipt(taskOrJson) {
 
         const dateStr   = new Date(task.dueDate).toLocaleDateString('fr-FR');
         const dateToday = new Date().toLocaleDateString('fr-FR');
-        const ref       = 'SW-' + (task.id || '').toString().slice(-6).toUpperCase();
+        const ref       = 'FSW-' + (task.id || '').toString().slice(-6).toUpperCase();
 
         // ✅ Message WhatsApp PREMIUM bien formaté pour le client
         let waClientLink = '';
@@ -1195,7 +1214,17 @@ function printReceipt(taskOrJson) {
                 `👗 *Article :* ${task.type}\n` +
                 `📅 *RDV :* ${dateStr}\n` +
                 (task.assignee ? `🧵 *Tailleur :* ${task.assignee}\n` : '') +
-                (task.no        win.document.write(`<!DOCTYPE html>
+                (task.notes ? `📝 *Notes :* ${task.notes}\n` : '') +
+                `━━━━━━━━━━━━━━━━━━━━\n` +
+                (task.price ? `💰 *Montant :* ${formatMoney(task.price)} ${cur}\n` : '') +
+                `━━━━━━━━━━━━━━━━━━━━\n` +
+                `✨ Merci pour votre confiance !\n` +
+                `📞 ${shopPhone} | 📍 ${shopAddr}`
+            );
+            waClientLink = `https://wa.me/${cp}?text=${clientMsg}`;
+        }
+
+        win.document.write(`<!DOCTYPE html>
 <html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Reçu ${ref} — ${shopName}</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -1736,8 +1765,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         startAdminBoutiquePolling();
     }
 
-    await renderAgenda();
     await updateStats();
+    await renderAgenda();
+    await renderAtelier();
+    await renderBoutique();
+    await renderBibliotheque();
+    await renderTailleur();
     await renderRevenueBanner();
 });
 

@@ -1419,6 +1419,7 @@ async function printReceipt(taskOrId) {
 
   <!-- HEADER -->
   <div class="hdr">
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=50x50&data=https://sarkin-wanka.vercel.app&color=D4AF37" style="position:absolute; top:20px; right:20px; width:45px; height:45px; border:1px solid rgba(211,175,55,0.3); border-radius:4px; padding:2px; background:#fff;" alt="Auth QR">
     <div class="gold-stripe-top"></div>
     <div class="logo-zone">
       <div class="logo-outer">

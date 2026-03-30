@@ -862,14 +862,19 @@ async function markAsDelivered(id) {
 }
 
 // ===================================================================
-// MODAL NOUVELLE COMMANDE
+// MODAL GESTIONNAIRE
 // ===================================================================
 let currentPhotoFile = null;
 let currentEditingTaskId = null;
 
-">${t.username}</option>`).join('');
-        });
-    }
+async function populateTailorsInForm() {
+    const s = document.getElementById('task-assignee');
+    if (!s) return;
+    const tailors = await getTailors();
+    const curVal = s.value;
+    s.innerHTML = '<option value="">— Boutique (Vente Rapide) —</option>' + 
+                  tailors.map(t => `<option value="${t.username}">${t.username}</option>`).join('');
+    if (curVal) s.value = curVal;
 }
 
 function closeNewTaskModal() {
@@ -1193,10 +1198,31 @@ function playTailorNotification(username) {
 // ===================================================================
 // IMPRESSION DU REÇU
 // ===================================================================
-function printReceipt(taskOrJson) {
-    const task = typeof taskOrJson === 'string' ? JSON.parse(taskOrJson) : taskOrJson;
+async function printReceipt(taskOrId) {
+    let task = null;
+    if (typeof taskOrId === 'string') {
+        try {
+            // Tentative de parsing JSON si c'est l'objet sérialisé
+            task = JSON.parse(taskOrId);
+        } catch (e) {
+            // Sinon c'est un ID, on le cherche dans les tâches chargées
+            const all = await getTasks();
+            task = all.find(t => t.id === taskOrId);
+        }
+    } else {
+        task = taskOrId;
+    }
+
+    if (!task) {
+        showToast("Impossible de trouver les détails de cette commande.", "error");
+        return;
+    }
+
     const win = window.open('', '_blank');
-    if (!win) { showToast("Autorisez les pop-ups pour imprimer.", "error"); return; }
+    if (!win) {
+        showToast("Autorisez les pop-ups pour imprimer.", "error");
+        return;
+    }
 
     getSettings().then(settings => {
         const shopName  = settings.name  || "FAHAD SARKIN WANKA";
@@ -1829,7 +1855,7 @@ function setupPhoneAutocomplete() {
 // ===================================================================
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("---------------------------------------");
-    console.log("🚀 SARKIN WANKA NIGER - Dashboard v2.3");
+    console.log("🚀 SARKIN WANKA NIGER - Dashboard v2.5 (Fixed)");
     console.log("---------------------------------------");
     
     initTheme();

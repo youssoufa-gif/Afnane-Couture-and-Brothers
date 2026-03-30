@@ -1,7 +1,7 @@
 // ===================================================================
 // SERVICE WORKER — SARKIN WANKA NIGER v3.0 (Mode Hors-Ligne Complet)
 // ===================================================================
-const CACHE_NAME = 'sarkin-wanka-v2.3';
+const CACHE_NAME = 'sarkin-wanka-v2.5';
 
 const ASSETS_TO_CACHE = [
     '/',

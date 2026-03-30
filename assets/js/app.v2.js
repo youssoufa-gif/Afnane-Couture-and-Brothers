@@ -1482,18 +1482,18 @@ async function printReceipt(taskOrId) {
 
   </div>
 
-  <!-- BOUTONS (masqués en PDF) -->
-  <div class="actions">
-    ${waClientLink ? `<a href="${waClientLink}" target="_blank" class="btn btn-wa">&#128241; Envoyer via WhatsApp</a>` : ''}
-    <button onclick="window.print()" class="btn btn-print">&#128438; Sauvegarder en PDF</button>
-  </div>
-
   <!-- FOOTER SIMPLE -->
   <div class="footer" style="background:#fcfcfc;">
     <p>&#128222; ${shopPhone} &nbsp;&bull;&nbsp; &#128205; ${shopAddr}</p>
     <p style="margin-top:2px; font-size:11px;">🌍 <strong>sarkin-wanka.vercel.app</strong></p>
     <p style="margin-top:2px;">Merci pour votre confiance &mdash; <strong>${shopName}</strong></p>
     <div class="footer-brand">SARKIN WANKA NIGER &mdash; Excellence &amp; Qualit&eacute;</div>
+  </div>
+
+  <!-- BOUTONS (masqués en PDF) -->
+  <div class="actions" style="margin-top:15px; margin-bottom:30px;">
+    ${waClientLink ? `<a href="${waClientLink}" target="_blank" class="btn btn-wa" style="text-decoration:none;">&#128241; Envoyer via WhatsApp</a>` : ''}
+    <button onclick="window.print()" class="btn btn-print">&#128438; Sauvegarder en PDF</button>
   </div>
 
 </div>

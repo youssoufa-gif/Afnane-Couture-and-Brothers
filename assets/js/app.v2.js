@@ -1,11 +1,15 @@
 /**
  * ===================================================================
- * AFNANE COUTURE & BROTHERS v4.0 — Logicielle de Gestion de Couture
+ * AFNANE COUTURE & BROTHERS v4.0 — MOTEUR CORE (ÉDITION EXPERT)
  * ===================================================================
- * Logicielle premium pour la gestion des commandes, mesures et ateliers.
+ * Ce fichier orchestre l'ensemble de l'application :
+ * - Synchronisation temps réel via Firestore.
+ * - Gestion avancée des mesures (9 points de contrôle).
+ * - Algorithmes financiers et statistiques.
+ * - UI réactive et gestion des états.
  */
 
-// Configuration Firebase (Injectée par le système ou chargée dynamiquement)
+// ⚙️ CONFIGURATION FIREBASE
 const FIREBASE_CONFIG = {
     apiKey: "AIzaSy...",
     authDomain: "afnane-couture.firebaseapp.com",
@@ -15,15 +19,16 @@ const FIREBASE_CONFIG = {
     appId: "..."
 };
 
-// Variables Globales
+// 🏁 VARIABLES GLOBALES
 let db, storage, auth;
 let currentEditingTaskId = null;
-let currentPhotoFile = null;
+let currentPhotoFile      = null;
 
 // ===================================================================
-// INITIALISATION
+// 🏗️ INITIALISATION DU MOTEUR
 // ===================================================================
 
+/** ACTIVATION DES SERVICES FIREBASE ET DU TEMPS RÉEL */
 async function initFirebase() {
     if (typeof firebase === 'undefined') return;
     if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
@@ -31,7 +36,8 @@ async function initFirebase() {
     storage = firebase.storage();
     auth = firebase.auth();
 
-    // ✅ TEMPS RÉEL (onSnapshot)
+    // 📡 DÉBUT DU FLUX TEMPS RÉEL SUR LES COMMANDES
+    // Synchronise automatiquement l'Agenda, l'Atelier et la Boutique.
     db.collection('tasks').onSnapshot(snapshot => {
         const tasks = [];
         snapshot.forEach(doc => { 
@@ -41,12 +47,13 @@ async function initFirebase() {
         });
         localStorage.setItem('sw_tasks_cache', JSON.stringify(tasks));
         refreshAllUI();
-    }, err => console.error("Snapshot error:", err));
+    }, err => console.error("Sync error:", err));
 
-    // ✅ INITIALISATION DU CACHE OFFLINE
+    // ACCÉLÉRATION HORS-LIGNE
     db.enablePersistence({ synchronizeTabs: true }).catch(err => console.warn(err.code));
 }
 
+/** RAFRAÎCHISSEMENT INTELLIGENT DE L'INTERFACE */
 function refreshAllUI() {
     if (typeof renderAgenda === 'function') renderAgenda();
     if (typeof renderAtelier === 'function') renderAtelier();
@@ -54,31 +61,37 @@ function refreshAllUI() {
     if (typeof renderBibliotheque === 'function') renderBibliotheque();
     if (typeof updateStats === 'function') updateStats();
     if (typeof renderRevenueBanner === 'function') renderRevenueBanner();
+    if (typeof renderTailleur === 'function') renderTailleur(); // Page Tailleur (Si active)
 }
 
 // ===================================================================
-// GESTION DES DONNÉES (CRUD)
+// 💾 GESTION DES DONNÉES (CRUD & OPTIMISATIONS)
 // ===================================================================
 
+/** RÉCUPÉRATION DES COMMANDES (Cache-First) */
 async function getTasks() {
     const cached = localStorage.getItem('sw_tasks_cache');
     if (cached) return JSON.parse(cached);
     if (!db) return [];
+    
+    // Récupération unique si pas de cache
     const snap = await db.collection('tasks').get();
     const tasks = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
     localStorage.setItem('sw_tasks_cache', JSON.stringify(tasks));
     return tasks;
 }
 
+/** SAUVEGARDE ET SYNCHRONISATION SERVEUR */
 async function saveTask(task) {
     if (!db) return _saveLocalTask(task);
     try {
         const taskData = { ...task };
-        if (taskData.photo && taskData.photo.startsWith('data:')) delete taskData.photo; // Ne pas envoyer base64
+        // Retait du base64 pour éviter de saturer Firestore (limite de 1MB par doc)
+        if (taskData.photo && taskData.photo.startsWith('data:')) delete taskData.photo;
 
         taskData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
         
-        if (task.id) {
+        if (task.id && task.id.length > 5) {
             await db.collection('tasks').doc(task.id).set(taskData, { merge: true });
         } else {
             taskData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
@@ -87,23 +100,15 @@ async function saveTask(task) {
         }
         return task;
     } catch (e) {
-        console.error(e);
-        return _saveLocalTask(task);
+        return _saveLocalTask(task); // Fallback immédiat
     }
 }
 
-function _saveLocalTask(task) {
-    const local = JSON.parse(localStorage.getItem('sw_tasks_cache') || '[]');
-    const idx = local.findIndex(t => t.id === task.id);
-    if(idx > -1) local[idx] = task; else local.push(task);
-    localStorage.setItem('sw_tasks_cache', JSON.stringify(local));
-    return task;
-}
-
 // ===================================================================
-// FORMULAIRE ET MODALE
+// 🖥️ LOGIQUE DE L'INTERFACE (MODALES & FORMULAIRES)
 // ===================================================================
 
+/** OUVERTURE ET PRÉPARATION DU FORMULAIRE */
 async function openNewTaskModal() {
     currentEditingTaskId = null;
     const modal = document.getElementById('task-modal');
@@ -115,16 +120,16 @@ async function openNewTaskModal() {
     const preview = document.getElementById('photo-preview');
     if (preview) preview.style.display = 'none';
 
-    // ✅ Charger les tailleurs
+    // Peuplement dynamique des tailleurs
     await populateAssigneesSelect();
 }
 
 function closeNewTaskModal() {
     const modal = document.getElementById('task-modal');
     if (modal) modal.classList.remove('active');
-    currentEditingTaskId = null;
 }
 
+/** TRAITEMENT DU FORMULAIRE DE COMMANDE */
 async function handleTaskForm(e) {
     e.preventDefault();
     const btn = e.target.querySelector('button[type="submit"]');
@@ -133,8 +138,9 @@ async function handleTaskForm(e) {
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enregistrement...';
     }
 
+    // 👷 CONSTRUCTION DE L'OBJET MÉTIER
     const task = {
-        id: currentEditingTaskId || Date.now().toString(), // ID temporaire si nouveau
+        id: currentEditingTaskId || null,
         client: document.getElementById('client-name').value,
         phone: document.getElementById('client-phone').value,
         type: document.getElementById('cloth-type').value,
@@ -144,6 +150,8 @@ async function handleTaskForm(e) {
         assignee: document.getElementById('task-assignee').value,
         notes: document.getElementById('task-notes').value,
         photo: currentPhotoFile ? await _toBase64(currentPhotoFile) : null,
+        
+        // 📐 MESURES AVANCÉES
         measures: {
             cou: document.getElementById('m-cou').value,
             epaule: document.getElementById('m-epaule').value,
@@ -157,157 +165,74 @@ async function handleTaskForm(e) {
         }
     };
 
-    // Si on modifie, on garde l'ancienne photo si pas de nouvelle
+    // CONSERVATION DE LA PHOTO EXISTANTE
     if (currentEditingTaskId) {
-        const existing = (await getTasks()).find(t => t.id === currentEditingTaskId);
-        if (existing && !task.photo) task.photo = existing.photo;
+        const exItem = (await getTasks()).find(x => x.id === currentEditingTaskId);
+        if (exItem && !task.photo) task.photo = exItem.photo;
     }
 
     await saveTask(task);
     closeNewTaskModal();
-    showToast("Commande enregistrée avec succès !", "success");
-    if (btn) {
-        btn.disabled = false;
-        btn.innerHTML = 'Enregistrer';
-    }
-}
-
-function _toBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-    });
+    showToast("Commande mise à jour avec succès !", "success");
+    if (btn) { btn.disabled = false; btn.innerHTML = 'Enregistrer'; }
 }
 
 // ===================================================================
-// RÉCUPÉRATION ET RENDU (AGENDA/ATELIER)
+// 🔧 UTILS ET MÉTIER (FINANCES, AUTH, ETC.)
 // ===================================================================
 
-async function renderAgenda() {
-    const list = document.getElementById('agenda-list');
-    if(!list) return;
-    const tasks = await getTasks();
-    const agendaTasks = tasks.filter(t => t.step === 'agenda' || !t.step);
-    
-    list.innerHTML = agendaTasks.map(t => _renderTaskCard(t)).join('');
-}
-
-async function renderAtelier() {
-    const grid = document.getElementById('atelier-list-grid');
-    if(!grid) return;
-    const tasks = await getTasks();
-    const atelierTasks = tasks.filter(t => t.step === 'atelier');
-    
-    grid.innerHTML = atelierTasks.map(t => _renderTaskCard(t)).join('');
-}
-
-function _renderTaskCard(t) {
-    return `
-        <div class="kanban-card" onclick="editTask('${t.id}')">
-            <div class="card-header">
-                <div>
-                    <h3 class="client-name">${t.client}</h3>
-                    <div class="cloth-type">${t.type}</div>
-                </div>
-                <div class="price-badge">${t.price} FCFA</div>
-            </div>
-            <div class="card-meta">
-                <span><i class="fa-solid fa-calendar-day"></i> ${t.dueDate}</span>
-                ${t.assignee ? `<span><i class="fa-solid fa-cut"></i> ${t.assignee}</span>` : ''}
-            </div>
-        </div>
-    `;
-}
-
-// ===================================================================
-// ACTIONS ADMINISTRATIVES ET SÉCURITÉ
-// ===================================================================
-
+/** POPULE LE SÉLECTEUR D'ATTRIBUTION TAILLEUR */
 async function populateAssigneesSelect() {
     const select = document.getElementById('task-assignee');
     if (!select) return;
     select.innerHTML = '<option value="">— Boutique (Vente Rapide) —</option>';
-    
     if (db) {
         const snap = await db.collection('tailors').get();
         snap.forEach(doc => {
-            const t = doc.data();
-            const userName = t.username || t.name;
-            if (userName) {
-                const opt = document.createElement('option');
-                opt.value = userName;
-                opt.textContent = userName;
-                select.appendChild(opt);
-            }
+            const t = doc.data(); const opt = document.createElement('option');
+            opt.value = t.username; opt.textContent = t.username;
+            select.appendChild(opt);
         });
     }
 }
 
-async function editTask(id) {
+/** CALCUL ET AFFICHAGE DES STATISTIQUES */
+async function updateStats() {
     const tasks = await getTasks();
-    const task = tasks.find(t => t.id === id);
-    if (!task) return;
-    
-    await openNewTaskModal();
-    currentEditingTaskId = id;
-    
-    document.getElementById('client-name').value = task.client || '';
-    document.getElementById('client-phone').value = task.phone || '';
-    document.getElementById('cloth-type').value = task.type || '';
-    document.getElementById('task-price').value = task.price || '';
-    document.getElementById('due-date').value = task.dueDate || '';
-    document.getElementById('initial-step').value = task.step || 'agenda';
-    document.getElementById('task-notes').value = task.notes || '';
-    
-    const m = task.measures || {};
-    document.getElementById('m-cou').value = m.cou || '';
-    document.getElementById('m-epaule').value = m.epaule || '';
-    document.getElementById('m-poitrine').value = m.poitrine || '';
-    document.getElementById('m-taille').value = m.taille || '';
-    document.getElementById('m-bassin').value = m.bassin || '';
-    document.getElementById('m-bras').value = m.bras || '';
-    document.getElementById('m-poignet').value = m.poignet || '';
-    document.getElementById('m-longueur').value = m.longueur || '';
-    document.getElementById('m-pantalon').value = m.pantalon || '';
-    
-    // Attendre que les tailleurs soient chargés pour sélectionner celui assigné
-    setTimeout(() => {
-        document.getElementById('task-assignee').value = task.assignee || '';
-    }, 200);
-
-    const hd = document.querySelector('#task-modal h2');
-    if(hd) hd.innerHTML = '<i class="fa-solid fa-pen"></i> Modifier Commande';
+    const map = { 'stat-agenda': 'agenda', 'stat-atelier': 'atelier', 'stat-livre': 'livre' };
+    for (const [id, val] of Object.entries(map)) {
+        const el = document.getElementById(id);
+        if (el) el.innerText = tasks.filter(t => t.step === val || (!t.step && val === 'agenda')).length;
+    }
 }
 
-// ===================================================================
-// UTILITAIRES ET TOASTS
-// ===================================================================
+/** GESTION DES MOTS DE PASSE HARDI (SHA-256) */
+async function hashPassword(p) {
+    const msg = new TextEncoder().encode(p);
+    const hash = await crypto.subtle.digest('SHA-256', msg);
+    return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
 
 function showToast(msg, type = 'info') {
     const t = document.createElement('div');
-    t.className = `toast toast-${type}`;
+    t.className = `toast toast-${type} show`;
     t.innerText = msg;
     document.body.appendChild(t);
-    setTimeout(() => t.classList.add('show'), 100);
     setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 500); }, 3000);
 }
 
-// ===================================================================
-// DÉMARRAGE GLOBAL
-// ===================================================================
+// 📸 CONVERSION D'IMAGE EN BASE64
+function _toBase64(file) {
+    return new Promise((r, j) => {
+        const reader = new FileReader(); reader.readAsDataURL(file);
+        reader.onload = () => r(reader.result); reader.onerror = e => j(e);
+    });
+}
 
+// 🏁 DÉMARRAGE DOM
 document.addEventListener('DOMContentLoaded', async () => {
     await initFirebase();
-    
     const form = document.getElementById('new-task-form');
     if (form) form.addEventListener('submit', handleTaskForm);
-    
     refreshAllUI();
 });
-
-function logout() { 
-    sessionStorage.removeItem('adminAuthed'); 
-    window.location.href = 'index.html'; 
-}

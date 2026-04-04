@@ -34,8 +34,10 @@ Le reçu (`recu.html`) a été harmonisé avec la nouvelle charte graphique.
 - **Données :** Les nouvelles mesures avancées apparaissent désormais dynamiquement sur le reçu pour que le client et le tailleur aient les mêmes informations.
 
 ## 6. 📂 Structure du Code
-- **`assets/js/app.v2.js`** : Contient la logique centrale avec commentaires experts.
-- **`assets/css/style.v2.css`** : Charte graphique avancée.
+- **`assets/js/app.v2.js`** : Logique centrale (Sync, Mesures, Finances) avec commentaires experts.
+- **`assets/css/style.v2.css`** : Design System premium (Variables, Flex, Grid).
+- **`DOCUMENTATION_UI_UX.md`** : Guide complet sur l'architecture HTML et CSS.
+- **`RAPPORT_REFONTE_V4.md`** : Ce document de synthèse.
 
 ## 7. 📖 Auto-Documentation (Maintenance Expert)
 Le fichier `app.v2.js` a été entièrement commenté selon les standards de développement professionnels :

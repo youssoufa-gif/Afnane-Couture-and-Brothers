@@ -1,20 +1,32 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <!-- Encodage des caractères (accents, etc.) -->
     <meta charset="UTF-8">
+    <!-- Viewport : rend le site adaptatif sur mobile -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#A67C00">
+    <!-- Couleur de la barre de statut mobile -->
+    <meta name="theme-color" content="#0056b3">
+    <!-- Configuration PWA (Application Progressive Web) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Sarkin Wanka">
+    <meta name="apple-mobile-web-app-title" content="Afnane Couture">
+    <!-- Icône de l'application -->
     <link rel="apple-touch-icon" href="assets/img/logo.png">
     <link rel="icon" type="image/png" href="assets/img/logo.png">
+    <!-- Fichier manifest PWA -->
     <link rel="manifest" href="manifest.json">
-    <title>SARKIN WANKA NIGER — Agenda</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Titre de la page (affiché dans l'onglet du navigateur) -->
+    <title>AFNANE COUTURE & BROTHERS — Agenda</title>
+    <!-- Méta description pour le SEO -->
+    <meta name="description" content="Gestion premium des commandes — Afnane Couture and Brothers, Maison de haute couture.">
+    <!-- Polices Google : Cormorant Garamond (serif élégant) + Outfit (moderne) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icônes Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Notre feuille de style principale -->
     <link rel="stylesheet" href="assets/css/style.v2.css">
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK : base de données en temps réel -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
@@ -22,42 +34,59 @@
 </head>
 <body class="light-theme">
 <div class="app-container">
-    <!-- SIDEBAR DESKTOP -->
-    <nav class="sidebar glass-panel">
-        <div class="sidebar-header" style="justify-content:center;padding:16px 0 0;">
-            <div class="logo" style="flex-direction:column;gap:8px;margin-bottom:2rem;">
-                <img src="assets/img/logo.png" alt="Sarkin Wanka" style="width:100px;height:100px;border-radius:50%;object-fit:cover;box-shadow:0 4px 16px rgba(166,124,0,0.3);"><div style="font-size:0.65rem;color:var(--primary-color);font-weight:700;margin-top:2px;letter-spacing:1px;opacity:0.8;">v2.6 PREMIUM</div>
+
+    <!-- ===== BARRE LATÉRALE DESKTOP ===== -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <img src="assets/img/logo.png" alt="Afnane Couture & Brothers">
+                <div class="brand-name">AFNANE COUTURE</div>
+                <div class="brand-tagline">& Brothers · Premium</div>
             </div>
         </div>
-        <ul class="nav-links">
-            <li class="active"><a href="index.html"><i class="fa-solid fa-calendar-day"></i> Agenda</a></li>
-            <li><a href="atelier.html"><i class="fa-solid fa-tape"></i> Atelier</a></li>
-            <li><a href="boutique.html" style="display:flex;justify-content:space-between;align-items:center;">
-                <span><i class="fa-solid fa-store"></i> Boutique</span>
-                <span class="boutique-badge badge badge-success" style="display:none;font-size:0.7rem;padding:2px 6px;">0</span>
-            </a></li>
-            <li><a href="bibliotheque.html"><i class="fa-solid fa-book-open"></i> Bibliothèque</a></li>
+
+        <ul class="nav-links" style="padding-top:10px;">
+            <li class="active"><a href="index.html"><i class="fa-solid fa-calendar-alt"></i> Agenda</a></li>
+            <li><a href="atelier.html"><i class="fa-solid fa-cut"></i> Atelier</a></li>
+            <li><a href="boutique.html"><i class="fa-solid fa-shop"></i> Boutique</a></li>
+            <li><a href="bibliotheque.html"><i class="fa-solid fa-folder-open"></i> Bibliothèque</a></li>
+            <li><a href="parametre.html"><i class="fa-solid fa-gear"></i> Paramètres</a></li>
+            <li style="margin-top:auto; border-top:1px solid var(--border-light); padding-top:10px;">
+                <a href="#" onclick="logout();return false;" style="color:var(--danger-color);"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+            </li>
         </ul>
+
         <div class="sidebar-footer">
-            <button id="theme-toggle" class="btn-icon"><i class="fa-solid fa-moon"></i></button>
-            <a href="parametre.html" class="btn-icon" title="Paramètres" style="text-decoration:none;"><i class="fa-solid fa-gear"></i></a>
+            <button id="theme-toggle" class="btn-icon" title="Thème"><i class="fa-solid fa-moon"></i></button>
+            <span style="font-size:0.7rem;color:var(--txt-hint);">v4.0</span>
         </div>
     </nav>
 
-    <!-- BOTTOM NAV MOBILE -->
+    <!-- ===== NAVIGATION BAS DE PAGE — visible seulement sur mobile ===== -->
     <nav class="bottom-nav">
         <ul>
-            <li class="active"><a href="index.html"><i class="fa-solid fa-calendar-day"></i><span>Agenda</span></a></li>
-            <li><a href="atelier.html"><i class="fa-solid fa-tape"></i><span>Atelier</span></a></li>
-            <li class="new-btn"><a href="#" onclick="openNewTaskModal();return false;" style="color:var(--primary-color);"><i class="fa-solid fa-plus-circle" style="font-size:1.5rem;"></i><span>Ajouter</span></a></li>
-            <li style="position:relative;"><a href="boutique.html"><i class="fa-solid fa-store"></i><span>Boutique</span>
-                <span class="boutique-badge badge badge-success" style="display:none;position:absolute;top:5px;right:15%;font-size:0.6rem;padding:2px 5px;min-width:16px;border:2px solid var(--surface-color);">0</span>
-            </a></li>
+            <li class="active"><a href="index.html"><i class="fa-solid fa-calendar-alt"></i><span>Agenda</span></a></li>
+            <li><a href="atelier.html"><i class="fa-solid fa-cut"></i><span>Atelier</span></a></li>
+            <li class="new-btn">
+                <a href="#" onclick="openNewTaskModal();return false;" style="color:var(--primary-color);">
+                    <i class="fa-solid fa-plus" style="font-size:1.5rem;"></i>
+                    <span>Ajouter</span>
+                </a>
+            </li>
+            <li style="position:relative;">
+                <a href="boutique.html">
+                    <i class="fa-solid fa-shop"></i><span>Boutique</span>
+                    <span class="boutique-badge badge badge-success"
+                          style="display:none;position:absolute;top:5px;right:15%;font-size:0.6rem;padding:2px 5px;min-width:16px;border:2px solid var(--surface-color);">0</span>
+                </a>
+            </li>
             <li><a href="parametre.html"><i class="fa-solid fa-gear"></i><span>Réglages</span></a></li>
         </ul>
     </nav>
 
+    <!-- ===== CONTENU PRINCIPAL ===== -->
     <main class="main-content">
+
         <header class="top-header">
             <div>
                 <h1>Agenda du Jour</h1>
@@ -70,44 +99,53 @@
             </div>
         </header>
 
-        <!-- Bannière CA -->
         <div class="revenue-banner glass-panel" id="revenue-banner" onclick="openFinanceModal()" style="cursor:pointer;">
             <div>
                 <div class="rev-label">Chiffre d'affaires total</div>
-                <div class="rev-amount">— FCFA</div>
+                <div class="rev-amount" id="rev-amount-display">— FCFA</div>
             </div>
             <i class="fa-solid fa-coins rev-icon"></i>
         </div>
 
-        <!-- Stats -->
+        <!-- ===== GRILLE DE STATISTIQUES ===== -->
         <section class="stats-grid">
             <div class="stat-card glass-panel" style="cursor:pointer;" onclick="window.location.href='index.html'">
-                <div class="stat-icon bg-primary-light"><i class="fa-solid fa-calendar-check text-primary"></i></div>
+                <div class="stat-icon" style="background:var(--primary-light); color:var(--primary-color);">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </div>
                 <div class="stat-details">
-                    <h3>Rendez-vous</h3>
+                    <h3>Agenda</h3>
                     <p class="stat-value" id="stat-agenda">–</p>
                 </div>
             </div>
+            
             <div class="stat-card glass-panel" style="cursor:pointer;" onclick="window.location.href='atelier.html'">
-                <div class="stat-icon bg-warning-light"><i class="fa-solid fa-tape text-warning"></i></div>
+                <div class="stat-icon" style="background:#fff4e6; color:#ff922b;">
+                    <i class="fa-solid fa-cut"></i>
+                </div>
                 <div class="stat-details">
-                    <h3>En Atelier</h3>
+                    <h3>Atelier</h3>
                     <p class="stat-value" id="stat-atelier">–</p>
                 </div>
             </div>
+            
             <div class="stat-card glass-panel" style="cursor:pointer;" onclick="window.location.href='boutique.html'">
-                <div class="stat-icon bg-success-light"><i class="fa-solid fa-bag-shopping text-success"></i></div>
+                <div class="stat-icon" style="background:#ebfbee; color:#40c057;">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                </div>
                 <div class="stat-details">
-                    <h3>Prêts Boutique</h3>
+                    <h3>Boutique</h3>
                     <p class="stat-value" id="stat-boutique">–</p>
                 </div>
             </div>
+            
             <div class="stat-card glass-panel">
-                <div class="stat-icon bg-danger-light"><i class="fa-solid fa-triangle-exclamation text-danger"></i></div>
+                <div class="stat-icon" style="background:#fff5f5; color:#fa5252;">
+                    <i class="fa-solid fa-clock"></i>
+                </div>
                 <div class="stat-details">
-                    <h3>En retard</h3>
+                    <h3>Retards</h3>
                     <p class="stat-value" id="stat-urgent">–</p>
-                    <p class="stat-sub">Livraison dépassée</p>
                 </div>
             </div>
         </section>
@@ -123,11 +161,11 @@
     </main>
 </div>
 
-<!-- Modal nouvelle commande -->
+<!-- ===== MODALE : NOUVELLE COMMANDE ===== -->
 <div id="task-modal" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeNewTaskModal()">&times;</span>
-        <h2><i class="fa-solid fa-plus" style="color:var(--primary-color);font-size:1.1rem;"></i> Nouvelle Commande</h2>
+        <h2><i class="fa-solid fa-cut" style="color:var(--primary-color);font-size:1.1rem;"></i> Nouvelle Commande</h2>
         <form id="new-task-form">
             <div class="form-row">
                 <div class="form-group">
@@ -141,12 +179,12 @@
             </div>
             <div class="form-group">
                 <label>Type de vêtement</label>
-                <input type="text" id="cloth-type" required placeholder="Ex : Robe de soirée">
+                <input type="text" id="cloth-type" required placeholder="Ex : Boubou de cérémonie">
             </div>
             <div class="form-row">
                 <div class="form-group">
                     <label>Prix (FCFA)</label>
-                    <input type="number" id="task-price" placeholder="Ex : 15000" inputmode="numeric">
+                    <input type="number" id="task-price" placeholder="Ex : 25000" inputmode="numeric">
                 </div>
                 <div class="form-group">
                     <label>Date de livraison</label>
@@ -155,19 +193,41 @@
             </div>
             <div class="form-row">
                 <div class="form-group">
-                    <label>Étape initiale</label>
+                    <label>Étape / Statut</label>
                     <select id="initial-step">
                         <option value="agenda">Agenda (Prise de mesure)</option>
                         <option value="atelier">Atelier (En confection)</option>
+                        <option value="boutique">En Boutique (Prêt)</option>
+                        <option value="livre">Déjà Livré</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>Attribuer au tailleur</label>
                     <select id="task-assignee">
-                        <option value="">— Atelier Général —</option>
+                        <option value="">— Boutique (Vente Rapide) —</option>
                     </select>
                 </div>
             </div>
+
+            <div style="margin:1.5rem 0 1rem; border-top:1px solid var(--border-light); padding-top:1rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                    <label style="margin:0; font-weight:700;"><i class="fa-solid fa-ruler-combined"></i> Prise de Mesures Avancée</label>
+                    <button type="button" class="btn btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="document.getElementById('advanced-measures').style.display = document.getElementById('advanced-measures').style.display === 'none' ? 'grid' : 'none'">Ouvrir/Fermer</button>
+                </div>
+                
+                <div id="advanced-measures" class="form-row" style="display:none; grid-template-columns: repeat(3, 1fr); gap:10px; margin-bottom:1.5rem;">
+                    <div class="form-group"><label style="font-size:0.7rem;">Cou</label><input type="text" id="m-cou" placeholder="cm"></div>
+                    <div class="form-group"><label style="font-size:0.7rem;">Épaule</label><input type="text" id="m-epaule" placeholder="cm"></div>
+                    <div class="form-group"><label style="font-size:0.7rem;">Poitrine</label><input type="text" id="m-poitrine" placeholder="cm"></div>
+                    <div class="form-group"><label style="font-size:0.7rem;">Taille</label><input type="text" id="m-taille" placeholder="cm"></div>
+                    <div class="form-group"><label style="font-size:0.7rem;">Bassin</label><input type="text" id="m-bassin" placeholder="cm"></div>
+                    <div class="form-group"><label style="font-size:0.7rem;">Bras</label><input type="text" id="m-bras" placeholder="cm"></div>
+                    <div class="form-group"><label style="font-size:0.7rem;">Poignet</label><input type="text" id="m-poignet" placeholder="cm"></div>
+                    <div class="form-group"><label style="font-size:0.7rem;">L. Totale</label><input type="text" id="m-longueur" placeholder="cm"></div>
+                    <div class="form-group"><label style="font-size:0.7rem;">Pantalon</label><input type="text" id="m-pantalon" placeholder="cm"></div>
+                </div>
+            </div>
+
             <div class="form-group">
                 <label>Photo du Tissu / Modèle <span style="font-weight:400;text-transform:none;">(Optionnel)</span></label>
                 <div class="file-upload-wrapper">
@@ -179,13 +239,18 @@
                     <img id="photo-preview" class="photo-preview" style="display:none;" alt="Aperçu">
                 </div>
             </div>
+            <!-- Notes et mesures libres -->
             <div class="form-group">
-                <label>Notes &amp; Mesures</label>
-                <textarea id="task-notes" rows="3" placeholder="Ex : Tour de taille 75cm, longueur 120cm…"></textarea>
+                <label>Notes &amp; Observations Supplémentaires</label>
+                <textarea id="task-notes" rows="2" placeholder="Ex: Couleur particulière, style de broderie..."></textarea>
             </div>
-            
+
+            <!-- Boutons d'action du formulaire -->
             <div class="form-actions" style="justify-content: space-between !important; display: flex !important;">
-                <button type="button" id="btn-delete-in-modal" class="btn btn-secondary" style="color:var(--danger-color); display:none; border-color:var(--danger-color);" onclick="handleDeleteFromModal()">
+                <!-- Bouton supprimer (visible seulement en mode édition) -->
+                <button type="button" id="btn-delete-in-modal" class="btn btn-secondary"
+                        style="color:var(--danger-color); display:none; border-color:var(--danger-color);"
+                        onclick="handleDeleteFromModal()">
                     <i class="fa-solid fa-trash"></i> Supprimer
                 </button>
                 <div style="display:flex; gap:10px; margin-left: auto;">
@@ -197,9 +262,10 @@
     </div>
 </div>
 
-<script src="assets/js/app.v2.js?v=2.6.30031239"></script>
+<!-- Script principal de l'application -->
+<script src="assets/js/app.v2.js?v=4.0.0"></script>
 <script>
-// Enregistrement du Service Worker (PWA)
+// Enregistrement du Service Worker (rend l'app utilisable hors connexion - PWA)
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')

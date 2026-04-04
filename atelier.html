@@ -1,18 +1,27 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <!-- Encodage des caractères -->
     <meta charset="UTF-8">
+    <!-- Viewport adaptatif pour mobile -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#A67C00">
+    <!-- Couleur de thème pour mobile -->
+    <meta name="theme-color" content="#0056b3">
+    <!-- Configuration PWA -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Sarkin Wanka">
+    <meta name="apple-mobile-web-app-title" content="Afnane Couture">
     <link rel="apple-touch-icon" href="assets/img/logo.png">
     <link rel="icon" type="image/png" href="assets/img/logo.png">
     <link rel="manifest" href="manifest.json">
-    <title>SARKIN WANKA NIGER — Atelier</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Titre de la page -->
+    <title>AFNANE COUTURE & BROTHERS — Atelier</title>
+    <meta name="description" content="Atelier de confection — Afnane Couture and Brothers.">
+    <!-- Polices Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icônes Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Feuille de style principale -->
     <link rel="stylesheet" href="assets/css/style.v2.css">
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -22,40 +31,67 @@
 </head>
 <body class="light-theme">
 <div class="app-container">
-    <!-- SIDEBAR DESKTOP -->
+
+    <!-- ===== BARRE LATÉRALE DESKTOP ===== -->
     <nav class="sidebar glass-panel">
         <div class="sidebar-header" style="justify-content:center;padding:16px 0 0;">
-            <div class="logo" style="flex-direction:column;gap:8px;margin-bottom:2rem;">
-                <img src="assets/img/logo.png" alt="SARKIN WANKA NIGER" style="width:100px;height:100px;border-radius:50%;object-fit:cover;box-shadow:0 4px 16px rgba(166,124,0,0.4),0 0 0 3px #A67C00;"><div style="font-size:0.65rem;color:var(--primary-color);font-weight:700;margin-top:2px;letter-spacing:1px;opacity:0.8;">v2.6 PREMIUM</div>
+            <div class="logo" style="flex-direction:column;gap:4px;margin-bottom:0.5rem;">
+                <img src="assets/img/logo.png" alt="Afnane Couture & Brothers"
+                     style="width:90px;height:90px;border-radius:50%;object-fit:cover;
+                            box-shadow:0 4px 20px rgba(184,150,46,0.4), 0 0 0 3px #0056b3, 0 0 0 5px rgba(184,150,46,0.15);">
+                <div class="brand-name">AFNANE COUTURE</div>
+                <div class="brand-tagline">& Brothers · Premium</div>
+                <div class="logo-divider"></div>
             </div>
         </div>
-        <ul class="nav-links">
-            <li><a href="index.html"><i class="fa-solid fa-calendar-day"></i> Agenda</a></li>
-            <li class="active"><a href="atelier.html"><i class="fa-solid fa-tape"></i> Atelier</a></li>
-            <li><a href="boutique.html" style="display:flex;justify-content:space-between;align-items:center;"><span><i class="fa-solid fa-store"></i> Boutique</span><span class="boutique-badge badge badge-success" style="display:none;font-size:0.7rem;padding:2px 6px;">0</span></a></li>
+        <ul class="nav-links" style="padding-top:10px;">
+            <li><a href="index.html"><i class="fa-solid fa-calendar-alt"></i> Agenda</a></li>
+            <!-- Page courante = active -->
+            <li class="active"><a href="atelier.html"><i class="fa-solid fa-cut"></i> Atelier</a></li>
+            <li><a href="boutique.html" style="display:flex;justify-content:space-between;align-items:center;">
+                <span><i class="fa-solid fa-shop"></i> Boutique</span>
+                <span class="boutique-badge badge badge-success" style="display:none;font-size:0.7rem;padding:2px 6px;">0</span>
+            </a></li>
             <li><a href="bibliotheque.html"><i class="fa-solid fa-book-open"></i> Bibliothèque</a></li>
         </ul>
         <div class="sidebar-footer">
-            <button id="theme-toggle" class="btn-icon"><i class="fa-solid fa-moon"></i></button>
-            <a href="parametre.html" class="btn-icon" title="Paramètres" style="text-decoration:none;"><i class="fa-solid fa-gear"></i></a>
+            <button id="theme-toggle" class="btn-icon" title="Changer le thème">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+            <a href="parametre.html" class="btn-icon" title="Paramètres" style="text-decoration:none;">
+                <i class="fa-solid fa-gear"></i>
+            </a>
         </div>
     </nav>
 
-    <!-- BOTTOM NAV MOBILE -->
+    <!-- ===== NAVIGATION MOBILE ===== -->
     <nav class="bottom-nav">
         <ul>
-            <li><a href="index.html"><i class="fa-solid fa-calendar-day"></i><span>Agenda</span></a></li>
-            <li class="active"><a href="atelier.html"><i class="fa-solid fa-tape"></i><span>Atelier</span></a></li>
-            <li class="new-btn"><a href="#" onclick="openNewTaskModal();return false;" style="color:var(--primary-color);"><i class="fa-solid fa-plus-circle" style="font-size:1.5rem;"></i><span>Ajouter</span></a></li>
-            <li style="position:relative;"><a href="boutique.html"><i class="fa-solid fa-store"></i><span>Boutique</span><span class="boutique-badge badge badge-success" style="display:none;position:absolute;top:5px;right:15%;font-size:0.6rem;padding:2px 5px;min-width:16px;border:2px solid var(--surface-color);">0</span></a></li>
+            <li><a href="index.html"><i class="fa-solid fa-calendar-alt"></i><span>Agenda</span></a></li>
+            <li class="active"><a href="atelier.html"><i class="fa-solid fa-cut"></i><span>Atelier</span></a></li>
+            <li class="new-btn">
+                <a href="#" onclick="openNewTaskModal();return false;" style="color:var(--primary-color);">
+                    <i class="fa-solid fa-plus" style="font-size:1.5rem;"></i>
+                    <span>Ajouter</span>
+                </a>
+            </li>
+            <li style="position:relative;">
+                <a href="boutique.html">
+                    <i class="fa-solid fa-shop"></i><span>Boutique</span>
+                    <span class="boutique-badge badge badge-success"
+                          style="display:none;position:absolute;top:5px;right:15%;font-size:0.6rem;padding:2px 5px;min-width:16px;border:2px solid var(--surface-color);">0</span>
+                </a>
+            </li>
             <li><a href="parametre.html"><i class="fa-solid fa-gear"></i><span>Réglages</span></a></li>
         </ul>
     </nav>
 
+    <!-- ===== CONTENU PRINCIPAL ===== -->
     <main class="main-content">
+        <!-- En-tête avec titre et bouton -->
         <header class="top-header">
             <div>
-                <h1>Atelier - En Confection</h1>
+                <h1>Atelier — Confection</h1>
                 <p class="subtitle" id="current-date">Aujourd'hui</p>
             </div>
             <div class="header-actions">
@@ -65,10 +101,12 @@
             </div>
         </header>
 
+        <!-- Section principale : cartes kanban des pièces en confection -->
         <section class="agenda-section">
             <div class="agenda-header">
                 <h2>Pièces en cours de confection</h2>
             </div>
+            <!-- Grille kanban remplie dynamiquement -->
             <div class="atelier-grid" id="atelier-list">
                 <div class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</div>
             </div>
@@ -76,11 +114,11 @@
     </main>
 </div>
 
-<!-- Modal nouvelle commande -->
+<!-- ===== MODALE : NOUVELLE COMMANDE ===== -->
 <div id="task-modal" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeNewTaskModal()">&times;</span>
-        <h2><i class="fa-solid fa-plus" style="color:var(--primary-color);font-size:1.1rem;"></i> Nouvelle Commande</h2>
+        <h2><i class="fa-solid fa-cut" style="color:var(--primary-color);font-size:1.1rem;"></i> Nouvelle Commande</h2>
         <form id="new-task-form">
             <div class="form-row">
                 <div class="form-group">
@@ -94,12 +132,12 @@
             </div>
             <div class="form-group">
                 <label>Type de vêtement</label>
-                <input type="text" id="cloth-type" required placeholder="Ex : Robe de soirée">
+                <input type="text" id="cloth-type" required placeholder="Ex : Boubou de cérémonie">
             </div>
             <div class="form-row">
                 <div class="form-group">
                     <label>Prix (FCFA)</label>
-                    <input type="number" id="task-price" placeholder="Ex : 15000" inputmode="numeric">
+                    <input type="number" id="task-price" placeholder="Ex : 25000" inputmode="numeric">
                 </div>
                 <div class="form-group">
                     <label>Date de livraison</label>
@@ -111,6 +149,7 @@
                     <label>Étape initiale</label>
                     <select id="initial-step">
                         <option value="agenda">Agenda (Prise de mesure)</option>
+                        <!-- Atelier sélectionné par défaut sur cette page -->
                         <option value="atelier" selected>Atelier (En confection)</option>
                     </select>
                 </div>
@@ -134,11 +173,13 @@
             </div>
             <div class="form-group">
                 <label>Notes &amp; Mesures</label>
-                <textarea id="task-notes" rows="3" placeholder="Ex : Tour de taille 75cm, longueur 120cm…"></textarea>
+                <textarea id="task-notes" rows="3" placeholder="Ex : Tour de taille 78cm, longueur 120cm…"></textarea>
             </div>
-            
+
             <div class="form-actions" style="justify-content: space-between !important; display: flex !important;">
-                <button type="button" id="btn-delete-in-modal" class="btn btn-secondary" style="color:var(--danger-color); display:none; border-color:var(--danger-color);" onclick="handleDeleteFromModal()">
+                <button type="button" id="btn-delete-in-modal" class="btn btn-secondary"
+                        style="color:var(--danger-color); display:none; border-color:var(--danger-color);"
+                        onclick="handleDeleteFromModal()">
                     <i class="fa-solid fa-trash"></i> Supprimer
                 </button>
                 <div style="display:flex; gap:10px; margin-left: auto;">
@@ -150,13 +191,14 @@
     </div>
 </div>
 
-<script src="assets/js/app.v2.js?v=2.6.30031239"></script>
+<script src="assets/js/app.v2.js?v=4.0.0"></script>
 <script>
+    // Initialisation au chargement de la page atelier
     document.addEventListener('DOMContentLoaded', async () => {
-        await initFirebase();
-        initTheme();
-        updateDateDisplay();
-        renderAtelier();
+        await initFirebase();   // Connexion à Firebase (base de données)
+        initTheme();            // Applique le thème clair/sombre sauvegardé
+        updateDateDisplay();    // Affiche la date du jour
+        renderAtelier();        // Charge et affiche les commandes en atelier
     });
 </script>
 </body>

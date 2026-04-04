@@ -1,11 +1,11 @@
 {
-  "name": "SARKIN WANKA NIGER",
-  "short_name": "Sarkin Wanka",
-  "description": "Gestion de commandes — SARKIN WANKA Fashion Design, Niamey Niger",
+  "name": "AFNANE COUTURE & BROTHERS",
+  "short_name": "Maison Afnane",
+  "description": "Maison Afnane & Brothers — Excellence en Haute Couture",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#F8F6F0",
-  "theme_color": "#A67C00",
+  "background_color": "#050505",
+  "theme_color": "#C9A84C",
   "orientation": "portrait-primary",
   "icons": [
     {

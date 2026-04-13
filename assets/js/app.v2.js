@@ -828,14 +828,19 @@ const lockWheel = (e) => {
     e.preventDefault();
 };
 
-/** Empêche l'utilisation du bouton "Retour" du navigateur */
+/** Empêche l'utilisation du bouton "Retour" du navigateur et force la re-connexion */
 const lockHistory = () => {
-    // On pousse un état fictif dans l'historique
+    // Si on est sur la page de connexion, on ne fait rien
+    if (window.location.href.includes('connexion.html')) return;
+
+    // On pousse un état fictif pour capturer le prochain "Retour"
     history.pushState(null, null, window.location.href);
+    
     window.onpopstate = () => {
-        // Si l'utilisateur clique sur "Retour", on le force à rester sur la page
-        history.pushState(null, null, window.location.href);
-        showToast("🔒 Navigation sécurisée : Veuillez utiliser les boutons de l'application.", "info");
+        // L'utilisateur a tenté un retour arrière (Flèche gauche, bouton navigateur, etc.)
+        // Sécurité : On vide la session et on redirige vers le login
+        localStorage.removeItem('afnane_user');
+        window.location.href = 'connexion.html?ref=security_exit';
     };
 };
 

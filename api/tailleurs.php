@@ -9,8 +9,12 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 // GET — Liste tous les tailleurs
 if ($method === 'GET') {
-    $stmt = $pdo->query("SELECT id, login AS username, role FROM utilisateurs ORDER BY login ASC");
-    echo json_encode($stmt->fetchAll());
+    try {
+        $stmt = $pdo->query("SELECT id, username, role FROM tailors ORDER BY username ASC");
+        echo json_encode($stmt->fetchAll());
+    } catch (\PDOException $e) {
+        echo json_encode(['error' => 'DB Error: ' . $e->getMessage()]);
+    }
 }
 
 // POST — Ajouter un tailleur
@@ -25,7 +29,7 @@ else if ($method === 'POST') {
     $role     = $data['role'] ?? 'tailleur';
 
     try {
-        $stmt = $pdo->prepare("INSERT INTO utilisateurs (login, mot_de_passe, role) VALUES (?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO tailors (username, password, role) VALUES (?, ?, ?)");
         $stmt->execute([$username, $password, $role]);
         echo json_encode(['success' => true, 'id' => $pdo->lastInsertId()]);
     } catch (\PDOException $e) {
@@ -39,8 +43,12 @@ else if ($method === 'DELETE') {
         echo json_encode(['success' => false, 'error' => 'ID manquant']);
         exit;
     }
-    $stmt = $pdo->prepare("DELETE FROM utilisateurs WHERE id = ? AND role != 'admin'");
-    $stmt->execute([$_GET['id']]);
-    echo json_encode(['success' => true]);
+    try {
+        $stmt = $pdo->prepare("DELETE FROM tailors WHERE id = ? AND role != 'admin'");
+        $stmt->execute([$_GET['id']]);
+        echo json_encode(['success' => true]);
+    } catch (\PDOException $e) {
+        echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    }
 }
 ?>

@@ -80,3 +80,15 @@ VALUES (
     '6fa96e7a32f7087b41d9e3a20a7a57428e5ee6b4e2f6a3e17c4920a33823c4c5',
     'tailleur'
 );
+
+-- ----------------------------------------------------------------
+-- TABLE : galerie (modèles d'exposition)
+-- ----------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS galerie (
+    id            INT AUTO_INCREMENT PRIMARY KEY,
+    titre         VARCHAR(255) NOT NULL,
+    prix          DECIMAL(12, 2) DEFAULT 0,
+    categorie     VARCHAR(100) DEFAULT 'Non classé',
+    photo         LONGTEXT,
+    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

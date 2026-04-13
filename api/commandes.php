@@ -1,6 +1,7 @@
 <?php
 /**
- * AFNANE COUTURE — API PHP / MYSQL (STRUCTURE RELATIONNELLE UML)
+ * AFNANE COUTURE — API PHP / MYSQL (GESTION DES COMMANDES)
+ * Compatible avec le schéma database.sql (tasks & measurements)
  */
 require_once 'config.php';
 
@@ -14,57 +15,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { exit(0); }
 $method = $_SERVER['REQUEST_METHOD'];
 
 // ----------------------------------------------------------------
-// GET — Lecture (avec Jointures Clients & Mesures)
+// GET — Lecture des commandes
 // ----------------------------------------------------------------
 if ($method === 'GET') {
     try {
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+            // Lecture d'une seule commande avec ses mesures
             $stmt = $pdo->prepare("
-                SELECT t.idCommande, t.idClient, t.date, t.statut, t.type_vetement, t.prix, t.date_livraison, t.assigne_a, t.notes, t.photo,
-                       c.nom AS client, c.telephone AS phone,
-                       m.idMesureCouture, m.type_de_couture, m.longueur_epaule, m.longueur_manche, m.taille_chemise, 
-                       m.poitrine, m.tour_cou, m.ceinture, m.cuisse, m.longueur_pantalon, m.cheville
-                FROM commandes t
-                LEFT JOIN clients c ON t.idClient = c.idClient
-                LEFT JOIN mesures_couture m ON t.idCommande = m.idCommande
-                WHERE t.idCommande = ?
+                SELECT t.*, m.cou, m.epaule, m.poitrine, m.taille, m.bassin, m.bras, m.poignet, m.longueur, m.pantalon
+                FROM tasks t
+                LEFT JOIN measurements m ON t.id = m.task_id
+                WHERE t.id = ?
             ");
             $stmt->execute([(int)$_GET['id']]);
             $task = $stmt->fetch();
 
             if ($task) {
-                // Compatibilité avec l'ancien moteur JS (champs à plat et measures objet)
-                $task['id'] = $task['idCommande'];
-                $task['dueDate'] = $task['date_livraison'];
-                $task['step'] = $task['statut'];
-                $task['createdAt'] = $task['date'];
-                
+                // Structure pour le frontend (objets imbriqués)
                 $task['measures'] = [
-                    'cou'      => $task['tour_cou']      ?? '',
-                    'epaule'   => $task['longueur_epaule'] ?? '',
+                    'cou'      => $task['cou']      ?? '',
+                    'epaule'   => $task['epaule']   ?? '',
                     'poitrine' => $task['poitrine'] ?? '',
-                    'taille'   => $task['taille_chemise']   ?? '',
-                    'bassin'   => $task['ceinture']   ?? '',
-                    'bras'     => $task['longueur_manche']     ?? '',
-                    'poignet'  => $task['longueur_manche']  ?? '', // Aliasing fallback
-                    'longueur' => $task['longueur_pantalon'] ?? '',
-                    'pantalon' => $task['longueur_pantalon'] ?? '',
+                    'taille'   => $task['taille']   ?? '',
+                    'bassin'   => $task['bassin']   ?? '',
+                    'bras'     => $task['bras']     ?? '',
+                    'poignet'  => $task['poignet']  ?? '',
+                    'longueur' => $task['longueur'] ?? '',
+                    'pantalon' => $task['pantalon'] ?? ''
                 ];
                 echo json_encode($task);
             } else {
                 echo json_encode(['error' => 'Commande introuvable']);
             }
         } else {
-            $stmt = $pdo->query("
-                SELECT t.idCommande AS id, c.nom AS client, c.telephone AS phone, t.type_vetement AS type, 
-                       t.prix AS price, t.date_livraison AS dueDate, t.statut AS step, 
-                       t.assigne_a AS assignee, t.notes, t.photo, t.date AS createdAt,
-                       m.tour_cou AS cou, m.longueur_epaule AS epaule, m.poitrine
-                FROM commandes t
-                LEFT JOIN clients c ON t.idClient = c.idClient
-                LEFT JOIN mesures_couture m ON t.idCommande = m.idCommande
-                ORDER BY t.date DESC
-            ");
+            // Liste toutes les commandes (version simplifiée pour le dashboard)
+            $stmt = $pdo->query("SELECT * FROM tasks ORDER BY createdAt DESC");
             echo json_encode($stmt->fetchAll());
         }
     } catch (\PDOException $e) {
@@ -79,7 +64,7 @@ else if ($method === 'POST') {
     $raw = file_get_contents('php://input');
     $data = json_decode($raw, true);
 
-    if (!$data || (empty($data['client']) && empty($data['idClient']))) {
+    if (!$data || empty($data['client'])) {
         echo json_encode(['success' => false, 'error' => 'Client manquant.']);
         exit;
     }
@@ -87,74 +72,55 @@ else if ($method === 'POST') {
     try {
         $pdo->beginTransaction();
 
-        // 1. Gestion du Client (Trouver ou Créer)
-        $idClient = $data['idClient'] ?? null;
-        if (!$idClient) {
-            $nom = trim($data['client']);
-            $tel = trim($data['phone'] ?? '');
-            $stmtC = $pdo->prepare("SELECT idClient FROM clients WHERE nom = ? AND telephone = ?");
-            $stmtC->execute([$nom, $tel]);
-            $existingC = $stmtC->fetch();
-            if ($existingC) {
-                $idClient = $existingC['idClient'];
-            } else {
-                $stmtInsC = $pdo->prepare("INSERT INTO clients (nom, telephone) VALUES (?, ?)");
-                $stmtInsC->execute([$nom, $tel]);
-                $idClient = $pdo->lastInsertId();
-            }
-        }
-
-        // 2. Commande
-        $idCommande = $data['id'] ?? null;
+        $id = $data['id'] ?? null;
         $params = [
-            $idClient,
-            $data['type'] ?? '',
+            $data['client'],
+            $data['phone']    ?? '',
+            $data['type']     ?? '',
             floatval($data['price'] ?? 0),
-            $data['dueDate'] ?? null,
-            $data['step'] ?? 'agenda',
+            $data['dueDate']  ?? null,
+            $data['step']     ?? 'agenda',
             $data['assignee'] ?? '',
-            $data['notes'] ?? '',
-            $data['photo'] ?? null
+            $data['notes']    ?? '',
+            $data['photo']    ?? null
         ];
 
-        if ($idCommande) {
+        if ($id && is_numeric($id)) {
+            // Update
             $stmt = $pdo->prepare("
-                UPDATE commandes 
-                SET idClient=?, type_vetement=?, prix=?, date_livraison=?, statut=?, assigne_a=?, notes=?, photo=?
-                WHERE idCommande=?
+                UPDATE tasks 
+                SET client=?, phone=?, type=?, price=?, dueDate=?, step=?, assignee=?, notes=?, photo=?
+                WHERE id=?
             ");
-            $params[] = $idCommande;
+            $params[] = $id;
             $stmt->execute($params);
         } else {
+            // Insert
             $stmt = $pdo->prepare("
-                INSERT INTO commandes (idClient, type_vetement, prix, date_livraison, statut, assigne_a, notes, photo, date) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                INSERT INTO tasks (client, phone, type, price, dueDate, step, assignee, notes, photo, createdAt) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
             ");
             $stmt->execute($params);
-            $idCommande = $pdo->lastInsertId();
-            
-            // Initialisation d'un paiement
-            if (floatval($data['price'] ?? 0) > 0) {
-                $stmtP = $pdo->prepare("INSERT INTO paiements (idCommande, idClient, montant, reste) VALUES (?, ?, ?, 0)");
-                $stmtP->execute([$idCommande, $idClient, floatval($data['price'])]);
-            }
+            $id = $pdo->lastInsertId();
         }
 
-        // 3. Mesures Couture
-        $m = $data['measures'] ?? [];
-        $stmtM = $pdo->prepare("
-            REPLACE INTO mesures_couture 
-            (idCommande, tour_cou, longueur_epaule, poitrine, taille_chemise, ceinture, longueur_manche, cuisse, longueur_pantalon, cheville)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ");
-        $stmtM->execute([
-            $idCommande,
-            $m['cou'] ?? 0, $m['epaule'] ?? 0, $m['poitrine'] ?? 0, $m['taille'] ?? 0,
-            $m['bassin'] ?? 0, $m['bras'] ?? 0, $m['cuisse'] ?? 0, $m['longueur'] ?? 0, $m['cheville'] ?? 0
-        ]);
+        // Gestion des mesures
+        if (isset($data['measures'])) {
+            $m = $data['measures'];
+            $stmtM = $pdo->prepare("
+                REPLACE INTO measurements 
+                (task_id, cou, epaule, poitrine, taille, bassin, bras, poignet, longueur, pantalon)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ");
+            $stmtM->execute([
+                $id,
+                $m['cou'] ?? '', $m['epaule'] ?? '', $m['poitrine'] ?? '', $m['taille'] ?? '',
+                $m['bassin'] ?? '', $m['bras'] ?? '', $m['poignet'] ?? '', $m['longueur'] ?? '', $m['pantalon'] ?? ''
+            ]);
+        }
 
         $pdo->commit();
-        echo json_encode(['success' => true, 'id' => $idCommande]);
+        echo json_encode(['success' => true, 'id' => $id]);
 
     } catch (Exception $e) {
         if ($pdo->inTransaction()) $pdo->rollBack();
@@ -163,7 +129,7 @@ else if ($method === 'POST') {
 }
 
 // ----------------------------------------------------------------
-// DELETE — Suppression (Cascade SQL gère le reste)
+// DELETE — Suppression
 // ----------------------------------------------------------------
 else if ($method === 'DELETE') {
     if (!isset($_GET['id'])) {
@@ -171,7 +137,7 @@ else if ($method === 'DELETE') {
         exit;
     }
     try {
-        $stmt = $pdo->prepare("DELETE FROM commandes WHERE idCommande = ?");
+        $stmt = $pdo->prepare("DELETE FROM tasks WHERE id = ?");
         $stmt->execute([(int)$_GET['id']]);
         echo json_encode(['success' => true]);
     } catch (\PDOException $e) {

@@ -22,18 +22,18 @@ $user = trim($data['username']);
 $pass = $data['password']; 
 
 try {
-    // 1. On cherche l'utilisateur dans la table utilisateurs
-    $stmt = $pdo->prepare("SELECT * FROM utilisateurs WHERE login = ?");
+    // 1. On cherche l'utilisateur dans la table tailors (cohérent avec database.sql)
+    $stmt = $pdo->prepare("SELECT * FROM tailors WHERE username = ?");
     $stmt->execute([$user]);
     $userData = $stmt->fetch();
 
     if ($userData) {
-        // 2. On vérifie le mot de passe (haché SHA-256)
-        if ($userData['mot_de_passe'] === $pass) {
+        // 2. On vérifie le mot de passe (haché SHA-256 comme dans le SQL)
+        if ($userData['password'] === $pass) {
             echo json_encode([
                 'success' => true,
                 'user' => [
-                    'username' => $userData['login'],
+                    'username' => $userData['username'],
                     'role' => $userData['role']
                 ]
             ]);

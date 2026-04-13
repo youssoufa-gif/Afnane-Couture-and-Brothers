@@ -17,7 +17,10 @@ const lockNavigation = (e) => {
 const lockWheel = (e) => e.preventDefault();
 const lockHistory = () => {
     history.pushState(null, null, window.location.href);
-    window.onpopstate = () => history.pushState(null, null, window.location.href);
+    window.onpopstate = () => {
+        localStorage.removeItem('afnane_user');
+        window.location.href = 'connexion.html?ref=security_exit_gallery';
+    };
 };
 document.addEventListener('keydown', lockNavigation, { passive: false });
 document.addEventListener('wheel', lockWheel, { passive: false });

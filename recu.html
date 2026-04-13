@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Afnane Couture — Reçu de Commande</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #0093b5; --gold: #C9A84C; --dark: #121418; --surface: #ffffff; --bg-page: #f0f3f7; --border: rgba(0,0,0,0.08); --radius: 12px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg-page); color: var(--dark); padding: 40px 20px; display: flex; flex-direction: column; align-items: center; overflow: hidden; touch-action: none; }
+        .no-print { position: fixed; top: 0; left: 0; right: 0; background: #fff; padding: 12px 20px; display: flex; justify-content: center; gap: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 1000; }
+        .receipt-container { width: 100%; max-width: 500px; background: var(--surface); margin: 60px auto 40px; padding: 40px; border-radius: var(--radius); box-shadow: 0 15px 40px rgba(0,0,0,0.08); position: relative; border-top: 5px solid var(--primary); }
+        .header { text-align: center; border-bottom: 1px dashed var(--border); padding-bottom: 25px; margin-bottom: 25px; }
+        .header img { width: 80px; height: 80px; border-radius: 50%; margin-bottom: 15px; border: 2px solid var(--primary); }
+        .brand-info h1 { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+        .brand-info p { font-size: 0.8rem; color: #666; margin-top: 4px; }
+        .receipt-id-box { background: var(--bg-page); padding: 12px; border-radius: 8px; margin-top: 20px; text-align: center; }
+        .receipt-id-box h2 { font-size: 0.9rem; text-transform: uppercase; color: var(--primary); letter-spacing: 2px; margin-bottom: 4px; }
+        .info-section { margin-bottom: 25px; }
+        .info-section h3 { font-size: 0.75rem; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 5px; letter-spacing: 1px; }
+        .info-item { margin-bottom: 6px; font-size: 0.93rem; display: flex; justify-content: space-between; }
+        .info-item span { font-weight: 600; color: #333; }
+        .summary-box { background: var(--dark); color: #fff; padding: 20px; border-radius: 8px; text-align: center; margin-top: 20px; }
+        .total-label { font-size: 0.75rem; text-transform: uppercase; opacity: 0.7; letter-spacing: 1px; }
+        .total-value { font-size: 1.6rem; font-weight: 700; color: var(--gold); margin-top: 5px; }
+        .footer { margin-top: 40px; text-align: center; font-size: 0.75rem; color: #999; border-top: 1px dashed var(--border); padding-top: 20px; line-height: 1.6; }
+        .btn { padding: 10px 18px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font-size: 0.85rem; transition: 0.3s; }
+        .btn-print { background: var(--primary); color: white; }
+        .btn-back { background: #eee; color: #333; }
+        .btn-whatsapp { background: #25D366; color: white; }
+        @media print { .no-print { display: none; } body { background: #fff; padding: 0; } .receipt-container { box-shadow: none; margin: 0; padding: 20px; max-width: 100%; border-top: none; } }
+    </style>
+</head>
+<body>
+    <div class="no-print">
+        <a href="index.html" class="btn btn-back"><i class="fa-solid fa-arrow-left"></i> Retour</a>
+        <button onclick="window.print()" class="btn btn-print"><i class="fa-solid fa-print"></i> Imprimer</button>
+        <button onclick="shareWhatsApp()" class="btn btn-whatsapp"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+    </div>
+
+    <div class="receipt-container" id="receipt-content">
+        <div class="header">
+            <img src="assets/img/logo.png" alt="Afnane Couture Logo">
+            <div class="brand-info">
+                <h1>Afnane Couture</h1>
+                <p>& Brothers — Haute Couture & Broderie Premium</p>
+                <p><i class="fa-solid fa-location-dot"></i> Niamey, Niger — Quartier Grand Marché</p>
+                <p><i class="fa-solid fa-phone"></i> +227 95 95 13 13</p>
+            </div>
+            <div class="receipt-id-box">
+                <h2>Reçu de Commande</h2>
+                <div id="order-id" style="font-weight: 700; font-size: 1.1rem;">#000000</div>
+                <div id="order-date" style="font-size: 0.8rem; color: #666; margin-top: 2px;">Date: --/--/----</div>
+            </div>
+        </div>
+        <div class="info-section">
+            <h3>Détails du Client</h3>
+            <div class="info-item">Nom complet : <span id="client-name">Chargement...</span></div>
+            <div class="info-item">Téléphone : <span id="client-phone">...</span></div>
+        </div>
+        <div class="info-section">
+            <h3>Détails de l'Article</h3>
+            <div class="info-item">Modèle : <span id="cloth-type">...</span></div>
+            <div class="info-item">Date de livraison : <span id="due-date">...</span></div>
+        </div>
+        <div class="info-section" id="notes-section">
+            <h3>Observations</h3>
+            <p id="task-notes" style="font-style: italic; color: #555; font-size: 0.85rem; line-height: 1.5;">Aucune observation particulière.</p>
+        </div>
+        <div class="summary-box">
+            <div class="total-label">Montant Total à Régler</div>
+            <div class="total-value" id="task-price">0 FCFA</div>
+        </div>
+        <div class="footer">
+            <p>Ce reçu fait foi d'engagement. <br> Toute commande non retirée après 3 mois ne pourra plus être réclamée.</p>
+            <p style="margin-top: 15px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 1px;">Afnane Couture & Brothers</p>
+        </div>
+    </div>
+
+    <script>
+        // 🔐 MOTEUR DE VERROUILLAGE (Mode Kiosque)
+        const lockNav = (e) => {
+            const KEYS = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' ','PageUp','PageDown','Home','End'];
+            if (!KEYS.includes(e.key)) return;
+            const tag = e.target.tagName.toLowerCase();
+            const type = (e.target.type || '').toLowerCase();
+            if (tag === 'textarea' || tag === 'select' || (tag === 'input' && !['checkbox', 'radio', 'range', 'button', 'submit'].includes(type)) || e.target.isContentEditable) return;
+            e.preventDefault();
+        };
+        const lockWheel = (e) => e.preventDefault();
+        const lockHistory = () => {
+            history.pushState(null, null, window.location.href);
+            window.onpopstate = () => history.pushState(null, null, window.location.href);
+        };
+        document.addEventListener('keydown', lockNav, { passive: false });
+        document.addEventListener('wheel', lockWheel, { passive: false });
+        document.addEventListener('mousewheel', lockWheel, { passive: false });
+        lockHistory();
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('id');
+        if (orderId) {
+            fetch(`api/commandes.php?id=${orderId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && !data.error) {
+                        document.getElementById('order-id').innerText = '#' + data.id.toString().padStart(6, '0');
+                        document.getElementById('order-date').innerText = 'Date: ' + new Date(data.createdAt).toLocaleDateString('fr-FR');
+                        document.getElementById('client-name').innerText = data.client;
+                        document.getElementById('client-phone').innerText = data.phone || 'N/A';
+                        document.getElementById('cloth-type').innerText = data.type;
+                        document.getElementById('due-date').innerText = new Date(data.dueDate).toLocaleDateString('fr-FR');
+                        document.getElementById('task-price').innerText = parseInt(data.price).toLocaleString() + ' FCFA';
+                        document.getElementById('task-notes').innerText = data.notes || 'Aucune observation particulière.';
+                    }
+                });
+        }
+        function shareWhatsApp() {
+            const client = document.getElementById('client-name').innerText;
+            const phone = document.getElementById('client-phone').innerText.replace(/\s+/g, '');
+            const orderId = document.getElementById('order-id').innerText;
+            const price = document.getElementById('task-price').innerText;
+            const type = document.getElementById('cloth-type').innerText;
+            const message = `*AFNANE COUTURE & BROTHERS* 🧵\n\nBonjour *${client}*,\n\nVoici votre reçu de commande *${orderId}* :\n- *Modèle :* ${type}\n- *Montant :* ${price}\n\nLien du reçu : ${window.location.href}\n\nMerci de votre confiance ! ✨`;
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+        }
+    </script>
+</body>
+</html>

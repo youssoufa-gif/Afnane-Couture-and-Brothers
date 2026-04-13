@@ -13,55 +13,56 @@
    VARIABLES GLOBALES — Système de design
    ============================================================ */
 :root {
-    /* ---- Bleu Professionnel & Accents ---- */
-    --primary-color: #0056b3;
-    --primary-light: #e7f1ff;
-    --primary-deep:  #003d80;
-    --accent-glow:   rgba(0, 86, 179, 0.15);
-    --border-light:  rgba(0, 0, 0, 0.08);
-    --grad-primary:  linear-gradient(135deg, #0056b3 0%, #007bff 100%);
-    --grad-primary-h: linear-gradient(135deg, #004494 0%, #0069d9 100%);
+    /* ---- Majesty Blue & Professional Accents ---- */
+    --primary-color: #0093b5;
+    --primary-light: #e0f4f9;
+    --primary-deep:  #007a96;
+    --accent-glow:   rgba(0, 147, 181, 0.15);
+    --border-light:  rgba(0, 0, 0, 0.06);
+    --grad-primary:  linear-gradient(135deg, #0093b5 0%, #00b4db 100%);
+    --grad-primary-h: linear-gradient(135deg, #007a96 0%, #0093b5 100%);
 
-    /* ---- Surfaces (Claires & Pros) ---- */
-    --bg:           #f4f7fa;
-    --bg-deep:      #e9ecef;
+    /* ---- Surfaces & Layout ---- */
+    --bg:           #f8fafd;
+    --bg-deep:      #f0f3f7;
     --surface:      #ffffff;
-    --surface-alt:  #f8f9fa;
-    --sidebar-bg:   #ffffff;  /* Sidebar claire */
-    --sidebar-alt:  #f1f3f5;
+    --surface-alt:  #fcfdfe;
+    --sidebar-bg:   #1a1d23;  /* Sidebar sombre premium */
+    --sidebar-txt:  #a6adbb;
+    --sidebar-active-bg: rgba(255, 255, 255, 0.1);
+    --sidebar-active-txt: #ffffff;
 
     /* ---- Texte ---- */
-    --txt-main:     #1a1d23;
-    --txt-muted:    #6c757d;
-    --txt-hint:     #adb5bd;
+    --txt-main:     #2c3e50;
+    --txt-muted:    #7f8c8d;
+    --txt-hint:     #bdc3c7;
     --txt-on-dark:  #ffffff;
-    --txt-primary:  #0056b3;
+    --txt-primary:  #0093b5;
 
     /* ---- Sémantique ---- */
-    --success:      #28a745;
-    --success-dim:  rgba(40, 167, 69, 0.1);
-    --warning:      #fd7e14;
-    --warning-dim:  rgba(253, 126, 20, 0.1);
-    --danger:       #dc3545;
-    --danger-dim:   rgba(220, 53, 69, 0.1);
-    --info:         #17a2b8;
-    --info-dim:     rgba(23, 162, 184, 0.1);
+    --success:      #27ae60;
+    --success-dim:  rgba(39, 174, 96, 0.1);
+    --warning:      #f39c12;
+    --warning-dim:  rgba(243, 156, 18, 0.1);
+    --danger:       #e74c3c;
+    --danger-dim:   rgba(231, 76, 60, 0.1);
+    --info:         #3498db;
+    --info-dim:     rgba(52, 152, 219, 0.1);
 
     /* ---- Layout ---- */
-    --sidebar-w:    280px;
-    --radius-xl:    16px;
-    --radius-lg:    12px;
-    --radius-md:    8px;
-    --radius-sm:    5px;
-    --speed:        0.2s;
+    --sidebar-w:    260px;
+    --radius-xl:    18px;
+    --radius-lg:    14px;
+    --radius-md:    10px;
+    --radius-sm:    6px;
+    --speed:        0.25s;
 
-    /* ---- Ombres Pro ---- */
-    --sh-xs:  0 1px 3px rgba(0,0,0,0.05);
-    --sh-sm:  0 4px 6px rgba(0,0,0,0.07);
-    --sh-md:  0 10px 15px rgba(0,0,0,0.1);
-    --sh-lg:  0 20px 25px rgba(0,0,0,0.12);
-    --sh-xl:  0 25px 50px rgba(0,0,0,0.15);
-    --sh-glow: 0 0 20px rgba(0, 86, 179, 0.2);
+    /* ---- Ombres Premium ---- */
+    --sh-xs:  0 2px 4px rgba(0,0,0,0.02);
+    --sh-sm:  0 4px 12px rgba(0,0,0,0.05);
+    --sh-md:  0 8px 24px rgba(0,0,0,0.08);
+    --sh-lg:  0 16px 48px rgba(0,0,0,0.12);
+    --sh-glow: 0 0 25px rgba(0, 147, 181, 0.25);
 }
 
 /* ---- THÈME SOMBRE PRO ---- */
@@ -89,12 +90,16 @@ body.dark-theme {
     -webkit-tap-highlight-color: transparent;
 }
 
-html { scroll-behavior: smooth; }
+html { 
+    scroll-behavior: smooth; 
+    overflow: hidden; /* Empêche tout défilement via le navigateur */
+}
 
 body {
     background: var(--bg);
     color: var(--txt-main);
-    overflow-x: hidden;
+    overflow: hidden; /* Empêche tout défilement via le navigateur */
+    touch-action: none; /* Désactive les gestes tactiles (swipe back, etc.) */
     transition: background var(--speed), color var(--speed);
     min-height: 100vh;
 }
@@ -130,9 +135,12 @@ body.dark-theme::after { opacity: 0.05; }
 /* ============================================================
    SIDEBAR — Design "Maison de Couture" (fond noir luxe)
    ============================================================ */
+/* ============================================================
+   SIDEBAR — Design Premium (Sombre)
+   ============================================================ */
 .sidebar {
     width: var(--sidebar-w);
-    background: var(--sidebar-bg); /* Blanc */
+    background: var(--sidebar-bg);
     position: fixed;
     left: 0; top: 0;
     height: 100vh;
@@ -140,116 +148,124 @@ body.dark-theme::after { opacity: 0.05; }
     flex-direction: column;
     padding: 0;
     z-index: 200;
-    overflow: hidden;
-    border-right: 1px solid var(--border-light);
-    box-shadow: 4px 0 30px rgba(0,0,0,0.03);
+    box-shadow: 4px 0 25px rgba(0,0,0,0.2);
 }
 
-/* On enlève les décorations "Couture" complexes de la v4.0 */
-.sidebar::before, .sidebar::after { display: none; }
-
-/* ---- Logo zone ---- */
 .sidebar-header {
-    padding: 2rem 1.5rem 1.5rem;
+    padding: 2.2rem 1rem 1.5rem;
     text-align: center;
-    position: relative;
-    border-bottom: 1px solid var(--border-light);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .sidebar-header img {
-    width: 60px; height: 60px; /* Plus sobre */
-    border-radius: 12px;
+    width: 90px; height: 90px;
+    border-radius: 50%;
     object-fit: cover;
-    border: 1px solid var(--border-light);
-    box-shadow: var(--sh-sm);
-    transition: transform 0.2s;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    box-shadow: var(--sh-md);
+    margin-bottom: 0.8rem;
 }
 
 .brand-name {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: 700;
-    color: var(--primary-color);
-    letter-spacing: 0;
-    text-transform: none;
-    margin-top: 10px;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .brand-tagline {
-    font-size: 0.7rem;
-    color: var(--txt-muted);
-    letter-spacing: 0;
-    text-transform: none;
+    font-size: 0.75rem;
+    color: var(--sidebar-txt);
+    margin-top: 4px;
 }
 
-.logo-divider { display: none; }
-
-/* ---- Navigation ---- */
 .nav-links {
     list-style: none;
     flex-grow: 1;
-    padding: 1.5rem 0.8rem;
+    padding: 1.5rem 1rem;
+    overflow-y: auto; /* Permet le défilement si trop de liens */
 }
 
-.nav-links li { margin-bottom: 5px; }
+.nav-links li { margin-bottom: 8px; }
 
 .nav-links a {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
+    gap: 15px;
+    padding: 12px 20px;
     text-decoration: none;
-    color: var(--txt-muted);
+    color: var(--sidebar-txt);
     font-weight: 500;
     font-size: 0.95rem;
     border-radius: var(--radius-md);
-    transition: all 0.2s;
+    transition: all 0.3s;
 }
 
-.nav-links a i {
-    font-size: 1.1rem;
-    color: var(--txt-hint);
-    transition: color 0.2s;
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'liga';
+    
+    /* FIX: Empêche le texte de déborder si la police ne charge pas */
+    width: 24px;
+    height: 24px;
+    overflow: hidden;
+    flex-shrink: 0;
 }
 
-/* Survol */
+.nav-links a i,
+.nav-links a .material-icons {
+    font-size: 1.25rem;
+    width: 24px;
+    text-align: center;
+}
+
 .nav-links a:hover {
-    color: var(--primary-color);
-    background: var(--bg-deep);
+    color: #ffffff;
+    background: var(--sidebar-active-bg);
 }
-.nav-links a:hover i { color: var(--primary-color); }
 
-/* Actif */
 .nav-links li.active a {
-    background: var(--primary-light);
-    color: var(--primary-color);
-    font-weight: 600;
+    background: var(--grad-primary);
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(0, 147, 181, 0.3);
 }
-.nav-links li.active a i { color: var(--primary-color); }
 
-/* ---- Pied sidebar ---- */
 .sidebar-footer {
+    padding: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--sidebar-bg); /* S'assure qu'il n'est pas transparent */
+    margin-top: auto; /* Force le pied en bas */
+    min-height: 80px;
+}
+
+.btn-logout {
+    color: #e74c3c;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 1.2rem;
-    border-top: 1px solid var(--border-light);
-    background: var(--surface-alt);
+    gap: 8px;
+    transition: transform 0.2s;
 }
-
-.btn-icon {
-    background: var(--surface);
-    border: 1px solid var(--border-light);
-    font-size: 1rem;
-    color: var(--txt-muted);
-    cursor: pointer;
-    padding: 8px 10px;
-    border-radius: var(--radius-sm);
-    box-shadow: var(--sh-xs);
-}
-.btn-icon:hover {
-    color: var(--primary-color);
-    border-color: var(--primary-color);
-}
+.btn-logout:hover { transform: translateX(5px); }
 
 /* ============================================================
    CONTENU PRINCIPAL
@@ -306,6 +322,33 @@ body.dark-theme::after { opacity: 0.05; }
 /* ============================================================
    BOUTONS — Design expert
    ============================================================ */
+.btn-icon-circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+    border: 1px solid var(--border-light);
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: all var(--speed);
+    box-shadow: var(--sh-xs);
+    flex-shrink: 0;
+}
+
+.btn-icon-circle:hover {
+    background: var(--primary-light);
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: var(--sh-sm);
+}
+
+.btn-icon-circle i, .btn-icon-circle .material-icons {
+    font-size: 1.4rem;
+}
+
 .btn {
     padding: 11px 22px;
     border-radius: var(--radius-md);
@@ -544,6 +587,61 @@ body.dark-theme .glass-panel {
 }
 
 /* ============================================================
+   NEW DASHBOARD GRID & CARDS
+   ============================================================ */
+.dashboard-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin-bottom: 2rem;
+}
+
+.dash-card {
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--sh-sm);
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 1px solid var(--border-light);
+}
+
+.dash-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--sh-md);
+}
+
+.dash-card-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.dash-card-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--txt-muted);
+    margin-bottom: 5px;
+}
+
+.dash-card-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--txt-main);
+}
+
+.dash-card-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+}
+
+/* ============================================================
    SECTION AGENDA
    ============================================================ */
 .agenda-section { animation: fadeSlideUp 0.5s ease 0.1s both; }
@@ -612,8 +710,11 @@ body.dark-theme .glass-panel {
     margin-bottom: 4px;
     line-height: 1.3;
 }
+.btn-logout i,
+.btn-logout .material-icons {
+    font-size: 1.1rem;
+}
 .item-info p {
-    font-size: 0.81rem;
     color: var(--txt-muted);
     display: flex;
     gap: 12px;
@@ -1051,7 +1152,8 @@ tbody tr:last-child td { border-bottom: none; }
     padding: 8px 12px;
     border-radius: var(--radius-sm);
 }
-.bottom-nav a i { font-size: 1.1rem; }
+.bottom-nav a i,
+.bottom-nav a .material-icons { font-size: 1.3rem; }
 
 .bottom-nav li.active a { color: var(--primary-color); }
 .bottom-nav a:hover { color: var(--primary-light); }

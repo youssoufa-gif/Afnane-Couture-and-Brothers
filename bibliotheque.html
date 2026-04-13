@@ -4,244 +4,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0056b3">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Afnane Couture">
-    <link rel="apple-touch-icon" href="assets/img/logo.png">
-    <link rel="icon" type="image/png" href="assets/img/logo.png">
-    <link rel="manifest" href="manifest.json">
-    <!-- Titre de la bibliothèque (historique) -->
     <title>AFNANE COUTURE & BROTHERS — Bibliothèque</title>
-    <meta name="description" content="Historique complet des commandes — Afnane Couture and Brothers.">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/style.v2.css">
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <link rel="stylesheet" href="assets/css/style.v2.css?v=1.4">
 </head>
 <body class="light-theme">
-<div class="app-container">
-
-    <!-- ===== SIDEBAR DESKTOP ===== -->
-    <nav class="sidebar glass-panel">
-        <div class="sidebar-header" style="justify-content:center;padding:16px 0 0;">
-            <div class="logo" style="flex-direction:column;gap:4px;margin-bottom:0.5rem;">
-                <img src="assets/img/logo.png" alt="Afnane Couture & Brothers"
-                     style="width:90px;height:90px;border-radius:50%;object-fit:cover;
-                            box-shadow:0 4px 20px rgba(184,150,46,0.4), 0 0 0 3px #0056b3, 0 0 0 5px rgba(184,150,46,0.15);">
+    <div class="app-container">
+        <!-- ===== BARRE LATÉRALE ===== -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/img/logo.png" alt="Afnane Couture & Brothers">
                 <div class="brand-name">AFNANE COUTURE</div>
                 <div class="brand-tagline">& Brothers · Premium</div>
-                <div class="logo-divider"></div>
             </div>
-        </div>
-        <ul class="nav-links" style="padding-top:10px;">
-            <li><a href="index.html"><i class="fa-solid fa-calendar-alt"></i> Agenda</a></li>
-            <li><a href="atelier.html"><i class="fa-solid fa-cut"></i> Atelier</a></li>
-            <li><a href="boutique.html" style="display:flex;justify-content:space-between;align-items:center;">
-                <span><i class="fa-solid fa-shop"></i> Boutique</span>
-                <span class="boutique-badge badge badge-success" style="display:none;font-size:0.7rem;padding:2px 6px;">0</span>
-            </a></li>
-            <!-- Page bibliothèque active -->
-            <li class="active"><a href="bibliotheque.html"><i class="fa-solid fa-book-open"></i> Bibliothèque</a></li>
-        </ul>
-        <div class="sidebar-footer">
-            <button id="theme-toggle" class="btn-icon" title="Changer le thème">
-                <i class="fa-solid fa-moon"></i>
-            </button>
-            <a href="parametre.html" class="btn-icon" title="Paramètres" style="text-decoration:none;">
-                <i class="fa-solid fa-gear"></i>
-            </a>
-        </div>
-    </nav>
-
-    <!-- ===== NAVIGATION MOBILE ===== -->
-    <nav class="bottom-nav">
-        <ul>
-            <li><a href="index.html"><i class="fa-solid fa-calendar-alt"></i><span>Agenda</span></a></li>
-            <li><a href="atelier.html"><i class="fa-solid fa-cut"></i><span>Atelier</span></a></li>
-            <li class="new-btn">
-                <a href="#" onclick="openNewTaskModal();return false;" style="color:var(--primary-color);">
-                    <i class="fa-solid fa-plus" style="font-size:1.5rem;"></i>
-                    <span>Ajouter</span>
+            <ul class="nav-links">
+                <li><a href="index.html"><span class="material-icons">dashboard</span> Dashboard</a></li>
+                <li><a href="index.html#agenda-section"><span class="material-icons">calendar_month</span> Agenda</a></li>
+                <li><a href="atelier.html"><span class="material-icons">content_cut</span> Atelier</a></li>
+                <li><a href="boutique.html"><span class="material-icons">storefront</span> Boutique</a></li>
+                <li><a href="galerie.html"><span class="material-icons">images</span> Galerie</a></li>
+                <li class="active"><a href="bibliotheque.html"><span class="material-icons">library_books</span> Bibliothèque</a></li>
+                <li><a href="utilisateurs.html"><span class="material-icons">people</span> Utilisateurs</a></li>
+                <li><a href="parametres.html"><span class="material-icons">settings</span> Paramètres</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" onclick="logout();return false;" class="btn-logout">
+                    <span class="material-icons">power_settings_new</span> Déconnexion
                 </a>
-            </li>
-            <li style="position:relative;">
-                <a href="boutique.html">
-                    <i class="fa-solid fa-shop"></i><span>Boutique</span>
-                    <span class="boutique-badge badge badge-success"
-                          style="display:none;position:absolute;top:5px;right:15%;font-size:0.6rem;padding:2px 5px;min-width:16px;border:2px solid var(--surface-color);">0</span>
-                </a>
-            </li>
-            <!-- Bibliothèque active sur mobile -->
-            <li class="active"><a href="bibliotheque.html"><i class="fa-solid fa-book-open"></i><span>Biblio</span></a></li>
-        </ul>
-    </nav>
+                <button id="theme-toggle" class="btn-icon" title="Thème"><span class="material-icons">dark_mode</span></button>
+            </div>
+        </nav>
 
-    <!-- ===== CONTENU PRINCIPAL ===== -->
-    <main class="main-content">
-        <header class="top-header">
-            <div>
-                <!-- Bibliothèque = historique de toutes les commandes -->
-                <h1>Bibliothèque &amp; Recettes</h1>
-                <p class="subtitle" id="current-date">Aujourd'hui</p>
-            </div>
-            <div class="header-actions">
-                <!-- Bouton imprimer l'historique -->
-                <button class="btn btn-primary" onclick="window.print()">
-                    <i class="fa-solid fa-print"></i> Historique
-                </button>
-            </div>
-        </header>
+        <!-- ===== NAVIGATION MOBILE ===== -->
+        <nav class="bottom-nav">
+            <ul>
+                <li><a href="index.html"><span class="material-icons">dashboard</span><span>Dashboard</span></a></li>
+                <li><a href="atelier.html"><span class="material-icons">content_cut</span><span>Atelier</span></a></li>
+                <li class="new-btn"><a href="#" onclick="openNewTaskModal();return false;"><span class="material-icons" style="font-size:1.8rem;color:#fff;">add_circle</span></a></li>
+                <li class="active"><a href="bibliotheque.html"><span class="material-icons">library_books</span><span>Biblio</span></a></li>
+                <li><a href="galerie.html"><span class="material-icons">images</span><span>Galerie</span></a></li>
+                <li><a href="utilisateurs.html"><span class="material-icons">people</span><span>Users</span></a></li>
+                <li><a href="parametres.html"><span class="material-icons">settings</span><span>Réglages</span></a></li>
+            </ul>
+        </nav>
 
-        <!-- Section historique complet -->
-        <section class="agenda-section">
-            <div class="agenda-header" style="flex-wrap: wrap; gap: 10px; justify-content: space-between;">
-                <h2>Historique complet</h2>
-                <!-- Recherche dans l'historique -->
-                <div style="flex: 1; max-width: 300px;">
-                    <input type="text" id="search-biblio"
-                           placeholder="Rechercher (Client, Type, Tel)..."
-                           oninput="renderBibliotheque(this.value)"
-                           style="width: 100%; padding: 11px 15px; border: var(--border-subtle);
-                                  border-radius: var(--border-radius-sm); font-family: 'Outfit';
-                                  background: var(--surface-color); color: var(--text-main);
-                                  font-size: 0.93rem; min-width: 200px;">
-                </div>
-            </div>
-            <!-- Tableau de l'historique (responsive) -->
-            <div class="glass-panel" style="overflow-x:auto; padding: 0;">
-                <table>
-                    <thead>
-                        <tr style="border-bottom:2px solid var(--border-light); background: var(--bg-deep);">
-                            <th style="padding:14px 12px;text-align:left;font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;"><i class="fa-solid fa-hashtag"></i> REF</th>
-                            <th style="padding:14px 12px;text-align:left;font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;"><i class="fa-solid fa-calendar-alt"></i> DATE & ÉTAT</th>
-                            <th style="padding:14px 12px;text-align:left;font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;"><i class="fa-solid fa-user"></i> CLIENT</th>
-                            <th style="padding:14px 12px;text-align:left;font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;"><i class="fa-solid fa-tshirt"></i> VÊTEMENT</th>
-                            <th style="padding:14px 12px;text-align:left;font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;"><i class="fa-solid fa-coins"></i> PRIX</th>
-                            <th style="padding:14px 12px;text-align:left;font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;"><i class="fa-solid fa-ellipsis-v"></i> ACTIONS</th>
-                        </tr>
-                    </thead>
-                    <tbody id="biblio-table-body">
-                        <!-- Chargé dynamiquement par JS -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </main>
-</div> <!-- Fin app-container -->
-
-<!-- MODAL : NOUVELLE COMMANDE / MODIFICATION -->
-<div id="task-modal" class="modal-overlay">
-    <div class="modal-card glass-panel">
-        <div class="modal-header">
-            <h2><i class="fa-solid fa-plus"></i> Nouvelle Commande</h2>
-            <button class="btn-close" onclick="closeNewTaskModal()">&times;</button>
-        </div>
-        <form id="new-task-form">
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Nom du Client</label>
-                    <input type="text" id="client-name" required placeholder="Prénom et Nom">
-                </div>
-                <div class="form-group">
-                    <label>N° WhatsApp</label>
-                    <input type="tel" id="client-phone" placeholder="Ex : +227 92 62 27 64">
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Type de vêtement / Modèle</label>
-                <input type="text" id="cloth-type" required placeholder="Ex : Grand Boubou, Ensemble Veste...">
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Montant (FCFA)</label>
-                    <input type="number" id="task-price" placeholder="Prix convenu">
-                </div>
-                <div class="form-group">
-                    <label>Date de Livraison</label>
-                    <input type="date" id="due-date" required>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Étape / Statut</label>
-                    <select id="initial-step">
-                        <option value="agenda">Agenda (Prise de mesure)</option>
-                        <option value="atelier">Atelier (En confection)</option>
-                        <option value="boutique">En Boutique (Prêt)</option>
-                        <option value="livre">Déjà Livré</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Attribuer au tailleur</label>
-                    <select id="task-assignee">
-                        <option value="">— Boutique (Vente Rapide) —</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- SECTION MESURES AVANCÉES -->
-            <div style="margin:1.5rem 0 1rem; border-top:1px solid var(--border-light); padding-top:1rem;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                    <label style="margin:0; font-weight:700;"><i class="fa-solid fa-ruler-combined"></i> Prise de Mesures Avancée</label>
-                    <button type="button" class="btn btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="document.getElementById('advanced-measures').style.display = document.getElementById('advanced-measures').style.display === 'none' ? 'grid' : 'none'">Ouvrir/Fermer</button>
-                </div>
-                
-                <div id="advanced-measures" class="form-row" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-bottom:1.5rem;">
-                    <div class="form-group"><label style="font-size:0.7rem;">Cou</label><input type="text" id="m-cou" placeholder="cm"></div>
-                    <div class="form-group"><label style="font-size:0.7rem;">Épaule</label><input type="text" id="m-epaule" placeholder="cm"></div>
-                    <div class="form-group"><label style="font-size:0.7rem;">Poitrine</label><input type="text" id="m-poitrine" placeholder="cm"></div>
-                    <div class="form-group"><label style="font-size:0.7rem;">Taille</label><input type="text" id="m-taille" placeholder="cm"></div>
-                    <div class="form-group"><label style="font-size:0.7rem;">Bassin</label><input type="text" id="m-bassin" placeholder="cm"></div>
-                    <div class="form-group"><label style="font-size:0.7rem;">Bras</label><input type="text" id="m-bras" placeholder="cm"></div>
-                    <div class="form-group"><label style="font-size:0.7rem;">Poignet</label><input type="text" id="m-poignet" placeholder="cm"></div>
-                    <div class="form-group"><label style="font-size:0.7rem;">L. Totale</label><input type="text" id="m-longueur" placeholder="cm"></div>
-                    <div class="form-group"><label style="font-size:0.7rem;">Pantalon</label><input type="text" id="m-pantalon" placeholder="cm"></div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Photo du Tissu / Modèle <span style="font-weight:400;text-transform:none;">(Optionnel)</span></label>
-                <div class="file-upload-wrapper">
-                    <input type="file" id="cloth-photo" accept="image/*" capture="environment" class="file-input">
-                    <div class="file-upload-box" id="file-upload-box">
-                        <i class="fa-solid fa-camera"></i>
-                        <span>Prendre une photo ou importer</span>
+        <main class="main-content">
+            <header class="top-header">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <a href="index.html" class="btn-icon-circle" title="Retour au Dashboard">
+                        <span class="material-icons" style="color: var(--primary-color);">dashboard</span>
+                    </a>
+                    <div>
+                        <h1>Bibliothèque & Recettes</h1>
+                        <p class="subtitle">Historique complet des commandes et archives</p>
                     </div>
-                    <img id="photo-preview" class="photo-preview" style="display:none;" alt="Aperçu">
                 </div>
-            </div>
-            <div class="form-group">
-                <label>Notes &amp; Observations Supplémentaires</label>
-                <textarea id="task-notes" rows="2" placeholder="Ex: Couleur particulière, style de broderie..."></textarea>
-            </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-file-pdf"></i> Exporter PDF</button>
+                </div>
+            </header>
 
-            <div class="form-actions" style="justify-content: space-between !important; display: flex !important;">
-                <button type="button" id="btn-delete-in-modal" class="btn btn-secondary"
-                        style="color:var(--danger-color); display:none; border-color:var(--danger-color);"
-                        onclick="handleDeleteFromModal()">
-                    <i class="fa-solid fa-trash"></i> Supprimer
-                </button>
-                <div style="display:flex; gap:10px; margin-left: auto;">
+            <section class="agenda-section">
+                <div class="agenda-header" style="flex-wrap: wrap; gap: 10px; justify-content: space-between;">
+                    <h2>Historique complet</h2>
+                    <div style="flex: 1; max-width: 300px;">
+                        <input type="text" id="search-biblio" placeholder="Rechercher un client..." oninput="renderBibliotheque(this.value)" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-light);">
+                    </div>
+                </div>
+                <div class="glass-panel" style="overflow-x:auto; padding: 0;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>REF</th>
+                                <th>DATE & ÉTAT</th>
+                                <th>CLIENT</th>
+                                <th>VÊTEMENT</th>
+                                <th>PRIX</th>
+                                <th>ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="biblio-table-body">
+                            <!-- JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODALE : COMMANDE -->
+    <div id="task-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeNewTaskModal()">&times;</span>
+            <h2 id="modal-title">Détails Commande</h2>
+            <form id="new-task-form">
+                <div class="form-row">
+                    <div class="form-group"><label>Client</label><input type="text" id="client-name" required></div>
+                    <div class="form-group"><label>WhatsApp</label><input type="tel" id="client-phone"></div>
+                </div>
+                <!-- ... -->
+                <div class="form-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeNewTaskModal()">Annuler</button>
                     <button type="submit" class="btn btn-primary">Enregistrer</button>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>
 
-<script src="assets/js/app.v2.js?v=4.0.0"></script>
-<script>
-    // Initialisation de la page bibliothèque / historique
-    document.addEventListener('DOMContentLoaded', async () => {
-        await initFirebase();        // Connexion Firebase
-        initTheme();                 // Thème clair/sombre
-        updateDateDisplay();         // Date du jour
-        renderBibliotheque();        // Charge l'historique complet
-    });
-</script>
+    <script src="assets/js/app.v2.js"></script>
 </body>
 </html>

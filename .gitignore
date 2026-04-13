@@ -1,0 +1,22 @@
+# Ignorer les fichiers de logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ignorer les dossiers système et IDE
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Ignorer les dossiers temporaires XAMPP si présents
+tmp/
+temp/
+
+# Ignorer les sauvegardes et fichiers de debug
+debug.php
+fix_db.php
+test_db.php
+test_fetch.php
+creer_test.php

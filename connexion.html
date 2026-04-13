@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0056b3">
+    <title>Connexion — Afnane Couture & Brothers</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.v2.css?v=1.4">
+    <style>
+        body { margin: 0; padding: 0; height: 100vh; display: flex; background: #f0f2f5; font-family: 'Outfit', sans-serif; overflow: hidden; touch-action: none; }
+        .login-container { display: flex; width: 100%; height: 100%; }
+        .login-card { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #fff; padding: 2rem; box-shadow: 10px 0 30px rgba(0,0,0,0.05); z-index: 2; }
+        .login-visual { flex: 1.5; background: linear-gradient(135deg, #001f3f 0%, #0056b3 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; color: #fff; position: relative; }
+        .login-visual i.main-icon { font-size: 8rem; margin-bottom: 20px; opacity: 0.9; }
+        .login-logo { width: 120px; height: 120px; border-radius: 50%; border: 4px solid #0056b3; padding: 5px; margin-bottom: 1.5rem; object-fit: cover; }
+        .login-form-box { width: 100%; max-width: 360px; }
+        .login-form-box h1 { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; color: #1a1d23; text-align: center; margin-bottom: 0.5rem; }
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; color: #555; }
+        .input-wrapper { position: relative; }
+        .input-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #aaa; }
+        .input-wrapper input { width: 100%; padding: 12px 15px 12px 45px; border: 1.5px solid #eee; border-radius: 10px; font-size: 1rem; box-sizing: border-box; transition: 0.3s; background: #f9f9f9; }
+        .input-wrapper input:focus { border-color: #0056b3; background: #fff; outline: none; }
+        .masked-field { -webkit-text-security: disc; text-security: disc; }
+        .btn-submit { width: 100%; padding: 14px; background: #0056b3; color: #fff; border: none; border-radius: 10px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.3s; margin-top: 1rem; }
+        @media (max-width: 900px) { .login-visual { display: none; } }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-form-box">
+                <div style="text-align: center;">
+                    <img src="assets/img/logo.png" alt="Afnane Couture Logo" class="login-logo">
+                </div>
+                <h1>Maison de Couture</h1>
+                <p style="text-align:center; color:#888; margin-bottom: 2rem; font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase;">✨ Afnane Couture & Brothers</p>
+
+                <form id="auth-form" autocomplete="off">
+                    <div class="form-group">
+                        <label>Identifiant (Téléphone ou Nom)</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-user"></i>
+                            <input type="text" id="afn_connect_id" placeholder="Entrez votre identifiant" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Mot de passe</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="text" id="afn_secret_key" class="masked-field" placeholder="••••••••" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit" id="submit-btn">
+                        <i class="fa-solid fa-right-to-bracket" style="margin-right: 8px;"></i> Accéder au Tableau de Bord
+                    </button>
+                    <p id="error-box" style="display:none; color:#e74c3c; text-align:center; margin-top:15px; font-size:0.9rem; font-weight:600;"></p>
+                </form>
+            </div>
+        </div>
+        <div class="login-visual">
+            <i class="fa-solid fa-scissors main-icon" style="font-size: 8rem; margin-bottom:20px;"></i>
+            <h2 style="font-family: 'Cormorant Garamond', serif; font-size: 3.5rem; margin: 0;">L'Excellence</h2>
+            <p style="font-size: 1.2rem; opacity: 0.8; letter-spacing: 2px;">Premium Fashion Management</p>
+            <div style="position: absolute; bottom: 30px; font-size: 0.8rem; opacity: 0.5;">Afnane Couture & Brothers © 2026</div>
+        </div>
+    </div>
+
+    <script>
+        // 🔐 MOTEUR DE VERROUILLAGE (Mode Kiosque)
+        const lockNav = (e) => {
+            const KEYS = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' ','PageUp','PageDown','Home','End'];
+            if (!KEYS.includes(e.key)) return;
+            const tag = e.target.tagName.toLowerCase();
+            const type = (e.target.type || '').toLowerCase();
+            if (tag === 'textarea' || tag === 'select' || (tag === 'input' && !['checkbox', 'radio', 'range', 'button', 'submit'].includes(type)) || e.target.isContentEditable) return;
+            e.preventDefault();
+        };
+        const lockWheel = (e) => e.preventDefault();
+        const lockHistory = () => {
+            history.pushState(null, null, window.location.href);
+            window.onpopstate = () => history.pushState(null, null, window.location.href);
+        };
+        document.addEventListener('keydown', lockNav, { passive: false });
+        document.addEventListener('wheel', lockWheel, { passive: false });
+        document.addEventListener('mousewheel', lockWheel, { passive: false });
+        lockHistory();
+        async function robustHash(str) {
+            const msgUint8 = new TextEncoder().encode(str);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        document.getElementById('auth-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const user = document.getElementById('afn_connect_id').value.trim();
+            const pass = document.getElementById('afn_secret_key').value;
+            const btn = document.getElementById('submit-btn');
+            const errorBox = document.getElementById('error-box');
+            errorBox.style.display = 'none';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authentification...';
+
+            try {
+                if (!window.crypto || !window.crypto.subtle) {
+                    throw new Error("Contexte non sécurisé : Utilisez 'localhost' ou 'HTTPS'.");
+                }
+                const securePass = await robustHash(pass);
+                const response = await fetch('api/connexion.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: user, password: securePass })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    localStorage.setItem('afnane_user', JSON.stringify(result.user));
+                    window.location.href = 'index.html';
+                } else {
+                    errorBox.innerText = result.error || "Identifiants incorrects.";
+                    errorBox.style.display = 'block';
+                    btn.innerHTML = 'Accéder au Tableau de Bord';
+                }
+            } catch (err) {
+                errorBox.innerText = err.message || "Erreur de connexion serveur.";
+                errorBox.style.display = 'block';
+                btn.innerHTML = 'Accéder au Tableau de Bord';
+            }
+        });
+    </script>
+</body>
+</html>

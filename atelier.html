@@ -1,205 +1,100 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <!-- Encodage des caractères -->
     <meta charset="UTF-8">
-    <!-- Viewport adaptatif pour mobile -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <!-- Couleur de thème pour mobile -->
     <meta name="theme-color" content="#0056b3">
-    <!-- Configuration PWA -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Afnane Couture">
-    <link rel="apple-touch-icon" href="assets/img/logo.png">
-    <link rel="icon" type="image/png" href="assets/img/logo.png">
-    <link rel="manifest" href="manifest.json">
-    <!-- Titre de la page -->
     <title>AFNANE COUTURE & BROTHERS — Atelier</title>
-    <meta name="description" content="Atelier de confection — Afnane Couture and Brothers.">
-    <!-- Polices Google -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Icônes Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Feuille de style principale -->
-    <link rel="stylesheet" href="assets/css/style.v2.css">
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <link rel="stylesheet" href="assets/css/style.v2.css?v=1.4">
 </head>
 <body class="light-theme">
-<div class="app-container">
-
-    <!-- ===== BARRE LATÉRALE DESKTOP ===== -->
-    <nav class="sidebar glass-panel">
-        <div class="sidebar-header" style="justify-content:center;padding:16px 0 0;">
-            <div class="logo" style="flex-direction:column;gap:4px;margin-bottom:0.5rem;">
-                <img src="assets/img/logo.png" alt="Afnane Couture & Brothers"
-                     style="width:90px;height:90px;border-radius:50%;object-fit:cover;
-                            box-shadow:0 4px 20px rgba(184,150,46,0.4), 0 0 0 3px #0056b3, 0 0 0 5px rgba(184,150,46,0.15);">
+    <div class="app-container">
+        <!-- ===== BARRE LATÉRALE ===== -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/img/logo.png" alt="Afnane Couture & Brothers">
                 <div class="brand-name">AFNANE COUTURE</div>
                 <div class="brand-tagline">& Brothers · Premium</div>
-                <div class="logo-divider"></div>
             </div>
-        </div>
-        <ul class="nav-links" style="padding-top:10px;">
-            <li><a href="index.html"><i class="fa-solid fa-calendar-alt"></i> Agenda</a></li>
-            <!-- Page courante = active -->
-            <li class="active"><a href="atelier.html"><i class="fa-solid fa-cut"></i> Atelier</a></li>
-            <li><a href="boutique.html" style="display:flex;justify-content:space-between;align-items:center;">
-                <span><i class="fa-solid fa-shop"></i> Boutique</span>
-                <span class="boutique-badge badge badge-success" style="display:none;font-size:0.7rem;padding:2px 6px;">0</span>
-            </a></li>
-            <li><a href="bibliotheque.html"><i class="fa-solid fa-book-open"></i> Bibliothèque</a></li>
-        </ul>
-        <div class="sidebar-footer">
-            <button id="theme-toggle" class="btn-icon" title="Changer le thème">
-                <i class="fa-solid fa-moon"></i>
-            </button>
-            <a href="parametre.html" class="btn-icon" title="Paramètres" style="text-decoration:none;">
-                <i class="fa-solid fa-gear"></i>
-            </a>
-        </div>
-    </nav>
-
-    <!-- ===== NAVIGATION MOBILE ===== -->
-    <nav class="bottom-nav">
-        <ul>
-            <li><a href="index.html"><i class="fa-solid fa-calendar-alt"></i><span>Agenda</span></a></li>
-            <li class="active"><a href="atelier.html"><i class="fa-solid fa-cut"></i><span>Atelier</span></a></li>
-            <li class="new-btn">
-                <a href="#" onclick="openNewTaskModal();return false;" style="color:var(--primary-color);">
-                    <i class="fa-solid fa-plus" style="font-size:1.5rem;"></i>
-                    <span>Ajouter</span>
+            <ul class="nav-links">
+                <li><a href="index.html"><span class="material-icons">dashboard</span> Dashboard</a></li>
+                <li><a href="index.html#agenda-section"><span class="material-icons">calendar_month</span> Agenda</a></li>
+                <li class="active"><a href="atelier.html"><span class="material-icons">content_cut</span> Atelier</a></li>
+                <li><a href="boutique.html"><span class="material-icons">storefront</span> Boutique</a></li>
+                <li><a href="galerie.html"><span class="material-icons">images</span> Galerie</a></li>
+                <li><a href="bibliotheque.html"><span class="material-icons">library_books</span> Bibliothèque</a></li>
+                <li><a href="utilisateurs.html"><span class="material-icons">people</span> Utilisateurs</a></li>
+                <li><a href="parametres.html"><span class="material-icons">settings</span> Paramètres</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" onclick="logout();return false;" class="btn-logout">
+                    <span class="material-icons">power_settings_new</span> Déconnexion
                 </a>
-            </li>
-            <li style="position:relative;">
-                <a href="boutique.html">
-                    <i class="fa-solid fa-shop"></i><span>Boutique</span>
-                    <span class="boutique-badge badge badge-success"
-                          style="display:none;position:absolute;top:5px;right:15%;font-size:0.6rem;padding:2px 5px;min-width:16px;border:2px solid var(--surface-color);">0</span>
-                </a>
-            </li>
-            <li><a href="parametre.html"><i class="fa-solid fa-gear"></i><span>Réglages</span></a></li>
-        </ul>
-    </nav>
+                <button id="theme-toggle" class="btn-icon" title="Thème"><span class="material-icons">dark_mode</span></button>
+            </div>
+        </nav>
 
-    <!-- ===== CONTENU PRINCIPAL ===== -->
-    <main class="main-content">
-        <!-- En-tête avec titre et bouton -->
-        <header class="top-header">
-            <div>
-                <h1>Atelier — Confection</h1>
-                <p class="subtitle" id="current-date">Aujourd'hui</p>
-            </div>
-            <div class="header-actions">
-                <button class="btn btn-primary" onclick="openNewTaskModal()">
-                    <i class="fa-solid fa-plus"></i> Nouvelle Commande
-                </button>
-            </div>
-        </header>
+        <!-- ===== NAVIGATION MOBILE ===== -->
+        <nav class="bottom-nav">
+            <ul>
+                <li><a href="index.html"><span class="material-icons">dashboard</span><span>Dashboard</span></a></li>
+                <li class="active"><a href="atelier.html"><span class="material-icons">content_cut</span><span>Atelier</span></a></li>
+                <li class="new-btn"><a href="#" onclick="openNewTaskModal();return false;"><span class="material-icons" style="font-size:1.8rem;color:#fff;">add_circle</span></a></li>
+                <li><a href="boutique.html"><span class="material-icons">storefront</span><span>Boutique</span></a></li>
+                <li><a href="galerie.html"><span class="material-icons">images</span><span>Galerie</span></a></li>
+                <li><a href="utilisateurs.html"><span class="material-icons">people</span><span>Users</span></a></li>
+                <li><a href="parametres.html"><span class="material-icons">settings</span><span>Réglages</span></a></li>
+            </ul>
+        </nav>
 
-        <!-- Section principale : cartes kanban des pièces en confection -->
-        <section class="agenda-section">
-            <div class="agenda-header">
-                <h2>Pièces en cours de confection</h2>
-            </div>
-            <!-- Grille kanban remplie dynamiquement -->
-            <div class="atelier-grid" id="atelier-list">
-                <div class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</div>
-            </div>
-        </section>
-    </main>
-</div>
-
-<!-- ===== MODALE : NOUVELLE COMMANDE ===== -->
-<div id="task-modal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeNewTaskModal()">&times;</span>
-        <h2><i class="fa-solid fa-cut" style="color:var(--primary-color);font-size:1.1rem;"></i> Nouvelle Commande</h2>
-        <form id="new-task-form">
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Nom du Client</label>
-                    <input type="text" id="client-name" required placeholder="Ex : Aïcha Moussa">
-                </div>
-                <div class="form-group">
-                    <label>N° WhatsApp</label>
-                    <input type="tel" id="client-phone" placeholder="Ex : +22792622764">
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Type de vêtement</label>
-                <input type="text" id="cloth-type" required placeholder="Ex : Boubou de cérémonie">
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Prix (FCFA)</label>
-                    <input type="number" id="task-price" placeholder="Ex : 25000" inputmode="numeric">
-                </div>
-                <div class="form-group">
-                    <label>Date de livraison</label>
-                    <input type="date" id="due-date" required>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Étape initiale</label>
-                    <select id="initial-step">
-                        <option value="agenda">Agenda (Prise de mesure)</option>
-                        <!-- Atelier sélectionné par défaut sur cette page -->
-                        <option value="atelier" selected>Atelier (En confection)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Attribuer au tailleur</label>
-                    <select id="task-assignee">
-                        <option value="">— Atelier Général —</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Photo du Tissu / Modèle <span style="font-weight:400;text-transform:none;">(Optionnel)</span></label>
-                <div class="file-upload-wrapper">
-                    <input type="file" id="cloth-photo" accept="image/*" capture="environment" class="file-input">
-                    <div class="file-upload-box" id="file-upload-box">
-                        <i class="fa-solid fa-camera"></i>
-                        <span>Prendre une photo ou importer</span>
+        <main class="main-content">
+            <header class="top-header">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <a href="index.html" class="btn-icon-circle" title="Retour au Tableau de Bord">
+                        <span class="material-icons" style="color: var(--primary-color);">dashboard</span>
+                    </a>
+                    <div>
+                        <h1>Atelier de Confection</h1>
+                        <p class="subtitle">Suivi des exemplaires en cours de fabrication</p>
                     </div>
-                    <img id="photo-preview" class="photo-preview" style="display:none;" alt="Aperçu">
                 </div>
-            </div>
-            <div class="form-group">
-                <label>Notes &amp; Mesures</label>
-                <textarea id="task-notes" rows="3" placeholder="Ex : Tour de taille 78cm, longueur 120cm…"></textarea>
-            </div>
+                <button class="btn btn-primary" onclick="openNewTaskModal()"><i class="fa-solid fa-plus-circle"></i> Nouvelle Commande</button>
+            </header>
 
-            <div class="form-actions" style="justify-content: space-between !important; display: flex !important;">
-                <button type="button" id="btn-delete-in-modal" class="btn btn-secondary"
-                        style="color:var(--danger-color); display:none; border-color:var(--danger-color);"
-                        onclick="handleDeleteFromModal()">
-                    <i class="fa-solid fa-trash"></i> Supprimer
-                </button>
-                <div style="display:flex; gap:10px; margin-left: auto;">
+            <section class="agenda-section">
+                <div class="agenda-header">
+                    <h2>Pièces en cours de confection</h2>
+                </div>
+                <div class="atelier-grid" id="atelier-list">
+                    <div class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODALE : NOUVELLE COMMANDE -->
+    <div id="task-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeNewTaskModal()">&times;</span>
+            <h2 id="modal-title">Nouvelle Commande</h2>
+            <form id="new-task-form">
+                <!-- Champs simplifiés pour l'exemple, JS gérera le reste -->
+                <div class="form-row">
+                    <div class="form-group"><label>Client</label><input type="text" id="client-name" required></div>
+                    <div class="form-group"><label>WhatsApp</label><input type="tel" id="client-phone"></div>
+                </div>
+                <div class="form-group"><label>Type de vêtement</label><input type="text" id="cloth-type" required></div>
+                <div class="form-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeNewTaskModal()">Annuler</button>
                     <button type="submit" class="btn btn-primary">Enregistrer</button>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>
 
-<script src="assets/js/app.v2.js?v=4.0.0"></script>
-<script>
-    // Initialisation au chargement de la page atelier
-    document.addEventListener('DOMContentLoaded', async () => {
-        await initFirebase();   // Connexion à Firebase (base de données)
-        initTheme();            // Applique le thème clair/sombre sauvegardé
-        updateDateDisplay();    // Affiche la date du jour
-        renderAtelier();        // Charge et affiche les commandes en atelier
-    });
-</script>
+    <script src="assets/js/app.v2.js"></script>
 </body>
 </html>
